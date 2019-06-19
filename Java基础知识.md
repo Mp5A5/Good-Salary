@@ -1,6 +1,3 @@
-<center>Java基础知识</center>
-=
-
 ## java中==和equals和hashCode的区别
 java中的数据类型，可分为两类：   
 1.基本数据类型，也称原始数据类型。  
@@ -103,7 +100,7 @@ public class TestString {
 s1 == s2  
 s1 equals s2  
 原 来，（java.lang.String的intern()方法"abc".intern()方法的返回值还是字符串"abc"，表面上看起来好像这个方法没什么用处。但实际上，它做了个小动作：检查字符串池里是否存在"abc"这么一个字符串，如果存在，就返回池里的字符串；如果不存在，该方法会 把"abc"添加到字符串池中，然后再返回它的引用。
-## ## hashCode：
+#### hashCode：
 这个方法返回对象的散列码，返回值是int类型的散列码（将该对象的内部地址转换成一个整数返回）。HashCode的存在主要是为了查找的快捷性，HashCode是用来在散列存储结构中确定对象的存储地址的。例如hashMap就是利用hashcode来计算存入哪一个entry的。  
 hashCode方法，一致的约定是：
 
