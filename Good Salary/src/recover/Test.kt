@@ -9,7 +9,7 @@ class Test {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val a = 1
+            val a:Polymorphism.A = Polymorphism().B()
         }
     }
 }
