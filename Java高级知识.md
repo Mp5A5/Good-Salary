@@ -1,38 +1,36 @@
-<center>Java高级知识</center>
-=
+## 哪些情况下的对象会被垃圾回收机制处理掉？
 
-##哪些情况下的对象会被垃圾回收机制处理掉？
-
-##讲一下常见编码方式？
-####编码
+## 讲一下常见编码方式？
+#### 编码
 编码是从一种形式或格式转换为另一种形式的过程也称为计算机编程语言的代码简称编码。
-####常见编码方式
 
-1. ASCII 码 
+#### 常见编码方式
+
+1.ASCII 码 
 
 共有 128 个，用一个字节的低 7 位表示，0~31 是控制字符如换行回车删除等；32~126 是打印字符，可以通过键盘输入并且能够显示出来。 
 
-2. ISO-8859-1 
+2.ISO-8859-1 
 
 128 个字符显然是不够用的，于是 ISO 组织在 ASCII 码基础上又制定了一些列标准用来扩展 ASCII 编码，它们是 ISO-8859-1~ISO-8859-15，其中 ISO-8859-1 涵盖了大多数西欧语言字符，所有应用的最广泛。ISO-8859-1 仍然是单字节编码，它总共能表示 256 个字符。 
 
-3. GB2312 
+3.GB2312 
 它的全称是《信息交换用汉字编码字符集 基本集》，它是双字节编码，总的编码范围是 A1-F7，其中从 A1-A9 是符号区，总共包含 682 个符号，从 B0-F7 是汉字区，包含 6763 个汉字。
 
-4. GBK 
+4.GBK 
 
 全称叫《汉字内码扩展规范》，是国家技术监督局为 windows95 所制定的新的汉字内码规范，它的出现是为了扩展 GB2312，加入更多的汉字，它的编码范围是 8140~FEFE（去掉 XX7F）总共有 23940 个码位，它能表示 21003 个汉字，它的编码是和 GB2312 兼容的，也就是说用 GB2312 编码的汉字可以用 GBK 来解码，并且不会有乱码。
 
-5. GB18030 
+5.GB18030 
 
 全称是《信息交换用汉字编码字符集》，是我国的强制标准，它可能是单字节、双字节或者四字节编码，它的编码与 GB2312 编码兼容，这个虽然是国家标准，但是实际应用系统中使用的并不广泛。 
 
-6. UTF-16 
+6.UTF-16 
 
 说到 UTF 必须要提到 Unicode（Universal Code 统一码），ISO 试图想创建一个全新的超语言字典，世界上所有的语言都可以通过这本字典来相互翻译。可想而知这个字典是多么的复杂，关于 Unicode 的详细规范可以参考相应文档。Unicode 是 Java 和 XML 的基础，下面详细介绍 Unicode 在计算机中的存储形式。   
 UTF-16 具体定义了 Unicode 字符在计算机中存取方法。UTF-16 用两个字节来表示 Unicode 转化格式，这个是定长的表示方法，不论什么字符都可以用两个字节表示，两个字节是 16 个 bit，所以叫 UTF-16。UTF-16 表示字符非常方便，每两个字节表示一个字符，这个在字符串操作时就大大简化了操作，这也是 Java 以 UTF-16 作为内存的字符存储格式的一个很重要的原因。 
 
-7. UTF-8 
+7.UTF-8 
 
 UTF-16 统一采用两个字节表示一个字符，虽然在表示上非常简单方便，但是也有其缺点，有很大一部分字符用一个字节就可以表示的现在要两个字节表示，存储空间放大了一倍，在现在的网络带宽还非常有限的今天，这样会增大网络传输的流量，而且也没必要。而 UTF-8 采用了一种变长技术，每个编码区域有不同的字码长度。不同类型的字符可以是由 1~6 个字节组成。
 UTF-8 有以下编码规则：   
@@ -56,7 +54,9 @@ Unicode符号范围 | UTF-8编码方式
 
 下面，还是以汉字"严"为例，演示如何实现UTF-8编码。  
 已知"严"的unicode是4E25（100111000100101），根据上表，可以发现4E25处在第三行的范围内（0000 0800-0000 FFFF），因此"严"的UTF-8编码需要三个字节，即格式是"1110xxxx 10xxxxxx 10xxxxxx"。然后，从"严"的最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0。这样就得到了，"严"的UTF-8编码是"11100100 10111000 10100101"，转换成十六进制就是E4B8A5。  
-##utf-8编码中的中文占几个字节；int型几个字节？
+
+## utf-8编码中的中文占几个字节；int型几个字节？
+
 * 占2个字节的：带有附加符号的拉丁文、希腊文、西里尔字母、亚美尼亚语、希伯来文、阿拉伯文、叙利亚文及它拿字母则需要二个字节编码  
 * 占3个字节的：基本等同于GBK，含21000多个汉字  
 * 占4个字节的：中日韩超大字符集里面的汉字，有5万多个  
@@ -89,6 +89,7 @@ Java中的代理设计模式(Proxy),也叫做委托模式，提供了对目标�
 
 
 #### 代理模式的分类
+
 ##### 静态代理
 
 静态代理，指的是在编译的时候就已经存在了，需要定义接口或者父类,被代理对象与代理对象一起实现相同的接口或者是继承相同父类。
@@ -102,6 +103,7 @@ public interface Movie {
 	void play(String name);
 }
 ``` 
+
 然后，我们要有一个真正的实现这个 Movie 接口的类，和一个只是实现接口的代理类。
 
 ```java
@@ -114,6 +116,7 @@ public class RealMovie implements Movie {
 
 }
 ```
+
 这个表示真正的影片。它实现了 Movie 接口，play() 方法调用时，影片就开始播放。那么 Proxy 代理呢？
 
 ```java
@@ -146,6 +149,7 @@ public class Cinema implements Movie {
 
 }
 ```
+
 通过测试：
 
 ```java
@@ -159,6 +163,7 @@ public static void main(String[] args) {
 
 	}
 ```
+
 运行结果：
 
 ```java
@@ -179,6 +184,7 @@ public interface SellWine {
 	 void mainJiu();
 }
 ```
+
 SellWine 是一个接口，你可以理解它为卖酒的许可证。
 
 ```java
@@ -237,6 +243,7 @@ public class Test {
 
 }
 ```
+
 结果：
 
 ```java
@@ -310,6 +317,7 @@ private static Class<?> getProxyClass0(ClassLoader loader,
         return proxyClassCache.get(loader, interfaces);
     }
 ```
+
 直接通过缓存获取，如果获取不到，注释说会通过 ProxyClassFactory 生成。
 
 ```java
@@ -573,6 +581,7 @@ private byte[] generateClassFile() {
     }
   }
 ```
+
 很明显了，最终是写在本地磁盘上来
 
 动态代理就一句话:<font color =red >系统帮我们生成了字节码文件保存在本地并生成一个InvocationHandler的代理子类，然后通过我们传进去的真实对象的引用，再帮忙调用各种接口方法，最终所有的方法都走
@@ -584,6 +593,7 @@ public Object invoke(Object proxy, Method method, Object[] args)
 </font>
 
 下面用一张图让大家记住动态代理涉及到的角色：
+
 ![avatar](pic/p62.png)
 
 * 红框中 $Proxy0就是通过 Proxy 动态生成的。
@@ -631,6 +641,7 @@ static public INotificationManager getService()  {
     return sService;  
 }
 ```
+
 这是Binder机制的内容，首先ServiceManager通过 getService方法获取了一个原生的裸的IBinder对象，然后通过AIDL机制的asInterface方法转换成了本地的代理对象，而我们在通知中的所有的操作都是有这个sService发起的，当然了，sService也是什么事情都干不了，只是跑腿，包装参数发送给真正的远程服务对象去做真正的事情，顺便提一下，Android系统中的绝大多数服务都在以这样形式而存在的，只有少数的比如AMS,PMS是以单列形式存在，因为AMS,PMS比较常用，按照常规的套路，先反射出sService字段，然后我们利用动态代理生成一个伪造的sService对象替换掉，代替我们的工作，这样所有的方法调用都会走动态代理的方法，这个我们前面已经说过了
 
 ```java
@@ -691,6 +702,7 @@ public class NotifictionProxy implements InvocationHandler {
         return null; 
   
 ```
+
 输出结果：
 
 ```java
@@ -703,9 +715,10 @@ public class NotifictionProxy implements InvocationHandler {
 2019-05-15 16:33:19.630 29928-29928/? E/-->: 参数为:[I@ea4bbc9
 2019-05-15 16:33:19.630 29928-29928/? E/-->: 参数为:0
 ```
+
 看到结果了吧，已经成功检测到被Hook的方法了，而具体如何执行就看具体的业务了。至此Java中的常用Hook手段:反射和动态代理就到此为止了，但实际上他们还有很多地方值得去使用，研究，只是限于篇幅，不在一一说明，以后如果有涉及到这方面的会再次提起的，大家有空可以研究源码，还是那句话，源码就是最好的学习资料。
 
-##Java 的异常体系
+## Java 的异常体系
 
 <font color=red>除非你能解决（或必须要处理）这个异常，否则不要捕获它，如果打算记录错误消息，那么别忘了把它再抛出去。</font>  
 <font color=red>异常既代表一种错误，又可以代表一个消息 。</font>
@@ -949,19 +962,24 @@ publicclass TestException {
 }
 ```
 
-######异常转译
+###### 异常转译
 异常转译就是将一种类型的异常转成另一种类型的异常，然后再抛出异常。之所以要进行转译，是为了更准确的描述异常。就我个人而言，我更喜欢称之为异常类型转换。在实际应用中，为了构建自己的日志系统，经常需要把系统的一些异常信息描述成我们想要的异常信息，就可以使用异常转译。异常转译针对所有Throwable类的子类而言，其子类型都可以相互转换。  
 通常而言，更为合理的转换方式是：  
 1、 Error——>Exception  
 2、 Error——>RuntimeException  
 3、 Exception——>RuntimeException,  
-##谈谈你对解析与分派的认识。
-###解析
-####基本概念
+
+## 谈谈你对解析与分派的认识。
+
+### 解析
+
+#### 基本概念
 JVM在执行一个方法的时候，它是如何找到这个方法的？  
 找一个方法，就需要知道所谓的地址。这个地址，从不同的层次看，对它的称呼也不同。<font color=red>从编译器javac的角度看，我称之为符号引用；从jvm虚拟机角度看，称之为直接引用。或者说从class字节码角度看，将这个地址称之为符号引用；当将class字节码加载到内存(方法区)中后，称之为直接引用。</font>
-####从符号引用如何变成直接引用的？
-1. 符号引用
+
+#### 从符号引用如何变成直接引用的？
+
+1.符号引用
 
 符号引用属于编译原理方面的概念，包括了下面三类常量：
 
@@ -990,7 +1008,7 @@ public class SymbolicTest {
 
 > 在class文件中不会保存各个方法、字段的最终内存布局信息，因此这些字段、方法的符号引用不经过运行期转换的话无法得到真正的内存入口地址，也就无直接被虚拟机使用。
 
-2. 直接引用
+2.直接引用
 JAVA虚拟机运行时数据区 分为很多部分：
 
 ![avatar](pic/p69.png)
@@ -1072,9 +1090,13 @@ System.out.println("hello world");
 
 因此，上面四类方法的调用称为解析调用，对于这四类方法，它们的符号引用在解析阶段就转成了直接引用。另外其实可以看出，<font color=red>解析调用的方法接收者是唯一确定的。</font>  
 <font color=red size=5>__*总结*__：</font>在java语言中，重载的方法(overload)，由于方法的描述符是唯一的。因此.java文件编译成.class字节码后，生成的方法符号引用也是唯一的，那么Code属性表里面方法调用指令就能确定具体调用哪个方法，因而是解析调用。
-###分派
+
+### 分派
+
 用重载(overload)和覆盖/重写(override)来解释分派调用，可参考[从虚拟机指令执行的角度分析JAVA中多态的实现原理](http://www.cnblogs.com/hapjin/p/9248525.html) 
-####分类
+
+#### 分类
+
 静态分派和动态分派。其中，重载属于静态分派、方法覆盖属于动态分派。  
 在分派中，涉及到一个概念：叫实际类型和静态类型。比如下面的语句：
 
@@ -1082,6 +1104,7 @@ System.out.println("hello world");
  Human man = new Man();
  Human woman = new Woman();
 ```
+
 等式左边叫静态类型，等式右边是实际类型。比如 man 这个引用，它的静态类型是Human，实际类型是Man；woman这个引用，静态类型是Human，实际类型是Woman。  参考[从虚拟机指令执行的角度分析JAVA中多态的实现原理](http://www.cnblogs.com/hapjin/p/9248525.html) 中图一和图二
 
 ```java
@@ -1142,17 +1165,19 @@ public class DynamicDispatch {
     }
 }
 ```
+
 ![avatar](pic/p75.png)
 
 中看出：sayHello方法的调用都是由invokevirtual指令执行的。我想，这也是解析与分派的一个区别吧 ，就是<font color=blue>分派调用是由invokevirtual指令来执行。</font>
 
-1. 静态分派
+1.静态分派
 静态分派方法的调用（方法重载）如下：
 
 ```java
 sr.sayHello(man);//hello, guy
 sr.sayHello(woman);//hello, guy
 ```
+
 man引用和woman引用的静态类型都是Human，因此方法重载是根据引用的<font color=blue>静态类型</font>来选择相应的方法执行的，也就是说：上面两条语句中的```sayHello(Human )```方法的参数类型都是Human，结果就是选择了参数类型为 Human 的 sayHello方法执行。  
 
 再来解释一下是如何确实选择哪一个sayHello方法执行的？main方法中有一行语句：```StaticDispatch sr = new StaticDispatch();```，因此 main方法的栈帧中，局部变量表中存储局部变量是sr，由于栈帧中还包含了动态连接信息，动态连接信息是：指向运行时常量池中该栈帧所属方法的引用。对于这行语句```sr.sayHello(man);```执行的时候，就会去字符串常量池中寻找sayHello方法的<font color=red>方法描述符</font>。sayHello方法有一个名称为man的参数，这个名为man的参数是由这条语句定义的```Human man = new Man();```，可以看出：名为man的参数声明的类型是Human，并且可从class字节码文件中看出方法描述符的内容是```sayHello:(Lorg/hapjin/dynamic/StaticDispatch$Human;)V```，因此，就能根据方法描述符唯一确定调用的方法是```public void sayHello(Human guy)```。
@@ -1162,7 +1187,8 @@ Human man = new Man();// man 是"语句类型的引用"
         
 public void sayHello(Human human){}//human 是sayHello方法的参数，称之为"参数类型的引用"
 ```
-2. 动态分派  
+
+2.动态分派  
 动态分派方法调用（方法覆盖）的代码如下：
 
 ```java
@@ -1173,18 +1199,21 @@ Human man = new Man();
 ```
 由上面可知：变量man引用的动态类型是Man，变量woman引用的动态类型是Woman，方法的执行是根据引用的 实际类型来选择相应的方法执行的。结果就是分别选择了 Man类的sayHello方法和Woman类的sayHello方法执行。
 
-####虚拟机动态分派的实现
+#### 虚拟机动态分派的实现
+
 由于动态分派是非常频繁的操作，实际实现中不可能真正如此实现。Java虚拟机是通过“稳定优化”的手段——在方法区中建立一个虚方法表（Virtual Method Table），通过使用方法表的索引来代替元数据查找以提高性能。虚方法表中存放着各个方法的实际入口地址（由于Java虚拟机自己建立并维护的方法表，所以没有必要使用符号引用，那不是跟自己过不去嘛），如果子类没有覆盖父类的方法，那么子类的虚方法表里面的地址入口与父类是一致的；如果重写父类的方法，那么子类的方法表的地址将会替换为子类实现版本的地址。  
 方法表是在类加载的连接阶段（验证、准备、解析）进行初始化，准备了子类的初始化值后，虚拟机会把该类的虚方法表也进行初始化。
 
-####invokevirtual指令的解析过程
+#### invokevirtual指令的解析过程
+
 * 找到操作数栈顶的第一个元素所指向的对象的实际类型，记作C
 * 如果在类型C中找到与常量中的描述符和简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；如果不通过，则返回java.lang.IllegalAccessError异常。
 * 否则，按照继承关系从下往上依次对C的各个父类进行第2步的搜索和验证过程。
 * 如果始终没有找到合适的方法，则抛出java.lang.AbstractMethodError异常。
 
 
-##修改对象A的equals方法的签名，那么使用HashMap存放这个对象实例的时候，会调用哪个equals方法？
+## 修改对象A的equals方法的签名，那么使用HashMap存放这个对象实例的时候，会调用哪个equals方法？
+
 会调用对象对象的equals方法。
 
 * 在java应用程序执行期间，如果在equals方法比较中所用的信息没有被修改，那么在同一个对象上多次调用hashCode方法时必须一致地返回相同的整数。如果多次执行同一个应用时，不要求该整数必须相同。
@@ -1194,22 +1223,25 @@ Human man = new Man();
 我们知道在Object类中，hashCode方法是通过Object对象的地址计算出来的，因为Object对象只与自身相等，所以同一个对象的地址总是相等的，计算取得的哈希码也必然相等，对于不同的对象，由于地址不同，所获取的哈希码自然也不会相等。如果一个类重写了equals方法，但没有重写hashCode方法，将会直接违法了第2条规定，这样的话，如果我们通过映射表(Map接口)操作相关对象时，就无法达到我们预期想要的效果。
 
 
-##说说你对Java反射的理解
-####反射机制
+## 说说你对Java反射的理解
+
+#### 反射机制
+
 JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。  
 简而言之，你可以在运行状态中通过反射机制做到：
 
 * 对于任意一个类，都能够知道这个类的所有属性和方法；
 * 对于任意一个对象，都能够调用它的任意一个方法和属性;
 
-####优点
+#### 优点
+
 灵活性高。因为反射属于动态编译，即只有到运行时才动态创建 &获取对象实例。
 >编译方式说明：
 
 >静态编译：在编译时确定类型 & 绑定对象。如常见的使用new关键字创建对象  
 >动态编译：运行时确定类型 & 绑定对象。动态编译体现了Java的灵活性、多态特性 & 降低类之间的藕合性
 
-####缺点
+#### 缺点
 
 * 执行效率低
 
@@ -1226,11 +1258,13 @@ JAVA反射机制是在运行状态中，对于任意一个类，都能够知道�
 
 由于反射允许代码执行一些在正常情况下不被允许的操作（比如访问私有的属性和方法），所以使用反射可能会导致意料之外的副作用－－代码有功能上的错误，降低可移植性。反射代码破坏了抽象性，因此当平台发生改变的时候，代码的行为就有可能也随着变化。
 
-####应用场景
+#### 应用场景
+
 * 动态获取 类文件结构信息（如变量、方法等） & 调用对象的方法
 * 常用的需求场景有：动态代理、工厂模式优化、Java JDBC数据库操作等
 
-#####Class
+##### Class
+
 对于每一种类，Java虚拟机都会初始化出一个Class类型的实例，每当我们编写并且编译一个新创建的类就会产生一个对应Class对象，并且这个Class对象会被保存在同名.class文件里。当我们new一个新对象或者引用静态成员变量时，Java虚拟机(JVM)中的类加载器系统会将对应Class对象加载到JVM中，然后JVM再根据这个类型信息相关的Class对象创建我们需要实例对象或者提供静态变量的引用值。  
 比如创建编译一个Shapes类，那么，JVM就会创建一个Shapes对应Class类的Class实例，该Class实例保存了Shapes类相关的类型信息，包括属性，方法，构造方法等等，通过这个Class实例可以在运行时访问Shapes对象的属性和方法等。另外通过Class类还可以创建出一个新的Shapes对象。这就是反射能够实现的原因，可以说Class是反射操作的基础。
 需要特别注意的是，每个class（注意class是小写，代表普通类）类，无论创建多少个实例对象，在JVM中都对应同一个Class对象。
@@ -1248,7 +1282,8 @@ Class c2 =  Class.forName("java.lang.String");
 System.out.println(c1 ==c2);
 // 输出结果：true
 ```
-#####获取Class
+
+##### 获取Class
 * Object.getClass()
 通过对象实例获取对应Class对象
 
@@ -1268,12 +1303,14 @@ Set<String> s = new HashSet<String>();
 //Returns the Class corresponding to java.util.HashSet.
 Class c = s.getClass();
 ```
+
 然而对于基本类型无法使用这种方法
 
 ```java
 boolean b;
 Class c = b.getClass();   // compile-time error
 ```
+
 * The .class Syntax
 
 通过类的类型获取Class对象,基本类型同样可以使用这种方法
@@ -1285,6 +1322,7 @@ Class c = boolean.class;
 //Returns the Class for String
 Class c = String.class;
 ```
+
 * Class.forName()和ClassLoader
 
 通过类的全限定名获取Class对象， 基本类型无法使用此方法
@@ -1292,6 +1330,7 @@ Class c = String.class;
 ```java
 Class c = Class.forName("java.lang.String");
 ```
+
 对于数组比较特殊
 
 ```java
@@ -1299,6 +1338,7 @@ Class cDoubleArray = Class.forName("[D");    //相当于double[].class
 
 Class cStringArray = Class.forName("[[Ljava.lang.String;");   //相当于String[][].class
 ```
+
 * * TYPE Field for Primitive Type Wrappers
 
 基本类型和void 类型的包装类可以使用TYPE字段获取
@@ -1308,6 +1348,7 @@ Class c = Double.TYPE;   //等价于 double.class.
 
 Class c = Void.TYPE;
 ```
+
 * Methods that Return Classes
 
 另外还有一些反射方法可以获取Class对象，但前提是你已经获取了一个Class对象。
@@ -1331,7 +1372,8 @@ java.lang.reflect.Method.getDeclaringClass()
 java.lang.reflect.Constructor.getDeclaringClass()
 ```
 
-######Class.forName 和 ClassLoader 的区别
+###### Class.forName 和 ClassLoader 的区别
+
 在java中Class.forName()和ClassLoader都可以对类进行加载。ClassLoader就是遵循双亲委派模型最终调用启动类加载器的类加载器，实现的功能是“通过一个类的全限定名来获取描述此类的二进制字节流”，获取到二进制流后放到JVM中。Class.forName()方法实际上也是调用的CLassLoader来实现的。
 
 Class.forName(String className)；这个方法的源码是 
@@ -1343,71 +1385,11 @@ Class.forName(String className)；这个方法的源码是
         return forName0(className, true, ClassLoader.getClassLoader(caller), caller);
     }
 ```
+
 最后调用的方法是forName0这个方法，在这个forName0方法中的第二个参数被默认设置为了true，这个参数代表是否对加载的类进行初始化，设置为true时会类进行初始化，代表会执行类中的静态代码块，以及对静态变量的赋值等操作。  
 也可以调用Class.forName(String name, boolean initialize,ClassLoader loader)方法来手动选择在加载类的时候是否要对类进行初始化。Class.forName(String name, boolean initialize,ClassLoader loader)的源码如下：
 
 ```java
-/**
-     * Returns the {@code Class} object associated with the class or
-     * interface with the given string name, using the given class loader.
-     * Given the fully qualified name for a class or interface (in the same
-     * format returned by {@code getName}) this method attempts to
-     * locate, load, and link the class or interface.  The specified class
-     * loader is used to load the class or interface.  If the parameter
-     * {@code loader} is null, the class is loaded through the bootstrap
-     * class loader.  The class is initialized only if the
-     * {@code initialize} parameter is {@code true} and if it has
-     * not been initialized earlier.
-     *
-     * <p> If {@code name} denotes a primitive type or void, an attempt
-     * will be made to locate a user-defined class in the unnamed package whose
-     * name is {@code name}. Therefore, this method cannot be used to
-     * obtain any of the {@code Class} objects representing primitive
-     * types or void.
-     *
-     * <p> If {@code name} denotes an array class, the component type of
-     * the array class is loaded but not initialized.
-     *
-     * <p> For example, in an instance method the expression:
-     *
-     * <blockquote>
-     *  {@code Class.forName("Foo")}
-     * </blockquote>
-     *
-     * is equivalent to:
-     *
-     * <blockquote>
-     *  {@code Class.forName("Foo", true, this.getClass().getClassLoader())}
-     * </blockquote>
-     *
-     * Note that this method throws errors related to loading, linking or
-     * initializing as specified in Sections 12.2, 12.3 and 12.4 of <em>The
-     * Java Language Specification</em>.
-     * Note that this method does not check whether the requested class
-     * is accessible to its caller.
-     *
-     * <p> If the {@code loader} is {@code null}, and a security
-     * manager is present, and the caller's class loader is not null, then this
-     * method calls the security manager's {@code checkPermission} method
-     * with a {@code RuntimePermission("getClassLoader")} permission to
-     * ensure it's ok to access the bootstrap class loader.
-     *
-     * @param name       fully qualified name of the desired class
-     * @param initialize if {@code true} the class will be initialized.
-     *                   See Section 12.4 of <em>The Java Language Specification</em>.
-     * @param loader     class loader from which the class must be loaded
-     * @return           class object representing the desired class
-     *
-     * @exception LinkageError if the linkage fails
-     * @exception ExceptionInInitializerError if the initialization provoked
-     *            by this method fails
-     * @exception ClassNotFoundException if the class cannot be located by
-     *            the specified class loader
-     *
-     * @see       java.lang.Class#forName(String)
-     * @see       java.lang.ClassLoader
-     * @since     1.2
-     */
     @CallerSensitive
     public static Class<?> forName(String name, boolean initialize,
                                    ClassLoader loader)
@@ -1430,14 +1412,21 @@ Class.forName(String className)；这个方法的源码是
         return forName0(name, initialize, loader, caller);
     }
 ```
+
 其中对参数initialize的描述是：if {@code true} the class will be initialized.意思就是说：如果参数为true，则加载的类将会被初始化。  
 eg:  
 一个含有静态代码块、静态变量、赋值给静态变量的静态方法的类
+
 ![avatar](pic/p77.png)
+
 根据运行结果得出Class.forName加载类是将类进了初始化，而ClassLoader的loadClass并没有对类进行初始化，只是把类加载到了虚拟机中。
-######通过Class获取类修饰符和类型
+
+###### 通过Class获取类修饰符和类型
+
 类的声明一般如下表示
+
 ![avatar](pic/p78.png)
+
 以HashMap为例，通过一个Demo来说明如何获取这些信息
 
 ```java
@@ -1508,6 +1497,7 @@ public class TestReflection {
     }
 } 
 ```
+
 输出结果：
 
 ```java
@@ -1523,7 +1513,9 @@ public class TestReflection {
  
 .Reflection:   -- No Annotations --
 ```
-####Member
+
+#### Member
+
 对于Member接口可能会有人不清楚是干什么的，但如果提到实现它的三个实现类，估计用过反射的人都能知道。我们知道类成员主要包括构造函数，变量和方法，Java中的操作基本都和这三者相关，而Member的这三个实现类就分别对应他们。
 
 ```java
@@ -1531,6 +1523,7 @@ java.lang.reflect.Field ：对应类变量
 java.lang.reflect.Method ：对应类方法
 java.lang.reflect.Constructor ：对应类构造函数
 ```
+
 反射就是通过这三个类才能在运行时改变对象状态。
 
 1 Field  
@@ -1620,6 +1613,7 @@ public void testField(){
         }
     }
 ```
+
 输入结果
 
 ```java
@@ -1657,6 +1651,7 @@ public void testField(){
         }
     }
 ```
+
 报错
 
 ```java
@@ -1665,6 +1660,7 @@ System.err:     at java.lang.reflect.Field.get(Native Method)
 System.err:     at com.example.ming.testnestscrollview.TestReflection.testField(TestReflection.java:22)
 System.err:     at com.example.ming.testnestscrollview.MainActivity.onCreate(MainActivity.java:17)
 ```
+
 观察一下异常信息java.lang.IllegalAccessException，说我们没有权限操作变量name；回到Cat类中查看一下name变量。
 
 ```java
@@ -1680,6 +1676,7 @@ AccessibleObject为我们提供了一个方法 setAccessible(boolean flag)，该
 ```java
 public final class Field extends AccessibleObject implements Member
 ```
+
 Field正是AccessibleObject的子类，那么简单了，只要在访问私有变量前调用  filed.setAccessible(true)就可以了  
 
 ```java
@@ -1689,12 +1686,14 @@ fieldName.setAccessible(true);
 String name = (String) fieldName.get(cat);
 ...
 ```
+
 打印结果
 
 ```java
 TestReflection: before set, Cat name = Tom age = 2
 TestReflection: after set, Cat name = Timmy age = 3
 ```
+
 注意Method和Constructor也都是继承AccessibleObject，所以如果遇到私有方法和私有构造函数无法访问，记得处理方法一样。
 
 2 Method
@@ -1720,18 +1719,21 @@ getReturnType()   获取目标方法返回类型对应的Class对象
 getGenericReturnType()  获取目标方法返回类型对应的Type对象
 这两个方法有啥区别呢？
 
-1. getReturnType()返回类型为Class，getGenericReturnType()返回类型为Type; Class实现Type。  
-2. 返回值为普通简单类型如Object, int, String等，getGenericReturnType()返回值和  getReturnType()一样
+1.getReturnType()返回类型为Class，getGenericReturnType()返回类型为Type; Class实现Type。 
+ 
+2.返回值为普通简单类型如Object, int, String等，getGenericReturnType()返回值和  getReturnType()一样
 例如 public String function1()  
 那么各自返回值为：  
 getReturnType() : class java.lang.String  
 getGenericReturnType() : class java.lang.String  
-3. 返回值为泛型    
+
+3.返回值为泛型    
 例如public T function2()    
 那么各自返回值为：  
 getReturnType() : class java.lang.Object  
 getGenericReturnType() : T  
-4. 返回值为参数化类型  
+
+4.返回值为参数化类型  
 例如public Class<String> function3()  
 那么各自返回值为：  
 getReturnType() : class java.lang.Class  
@@ -1839,9 +1841,12 @@ Class.newInstance()
 2. Class.newInstance()会将构造方法中抛出的异常不作处理原样抛出;Constructor.newInstance()会将构造方法中抛出的异常都包装成InvocationTargetException抛出。
 3. Class.newInstance()需要拥有构造方法的访问权限;Constructor.newInstance()可以通过setAccessible(true)方法绕过访问权限访问private构造方法。
 
-####数组和枚举
+#### 数组和枚举
+
 数组和枚举也是对象，但是在反射中，对数组和枚举的创建、访问和普通对象有那么一丢丢的不同，所以Java反射为数组和枚举提供了一些特定的API接口。
-######数组
+
+###### 数组
+
 * 数组类型
 数组类型：数组本质是一个对象，所以它也有自己的类型。  
 例如对于int[] intArray，数组类型为class [I。数组类型中的[个数代表数组的维度，例如[代表一维数组，[[代表二维数组；[后面的字母代表数组元素类型，I代表int，一般为类型的首字母大写(long类型例外，为J)。
@@ -1888,6 +1893,7 @@ Object array = Array.newInstance(int.class, 2);
 Array.setInt(array , 0, 1);
 Array.setInt(array , 1, 2);
 ```
+
 >注意：反射支持对数据自动加宽，但不允许数据narrowing(变窄?真难翻译)。意思是对于上述set方法，你可以在int类型数组中 set short类型数据，但不可以set long类型数据，否则会报IllegalArgumentException。
 
 * 多维数组
@@ -1904,7 +1910,9 @@ Array.setInt(row0, 1, 2);
 Array.setInt(row1, 0, 3);
 Array.setInt(row1, 1, 4);
 ```
-####枚举
+
+#### 枚举
+
 枚举隐式继承自java.lang.Enum，Enum继承自Object，所以枚举本质也是一个类，也可以有成员变量，构造方法，方法等；对于普通类所能使用的反射方法，枚举都能使用；另外java反射额外提供了几个方法为枚举服务。  
 Class.isEnum()  
 Indicates whether this class represents an enum type  
@@ -1912,20 +1920,27 @@ Class.getEnumConstants()
 Retrieves the list of enum constants defined by the enum in the order they're declared  
 java.lang.reflect.Field.isEnumConstant()  
 Indicates whether this field represents an element of an enumerated type
+
 ##说说你对Java注解的理解
-####注解
+
+#### 注解
+
 用一个词就可以描述注解，那就是元数据，即一种描述数据的数据。所以，可以说注解就是源代码的元数据。
 
 ![avatar](pic/p76.png)
 
 上面的代码中，我重写了toString()方法并使用了@Override注解。但是，即使我不使用@Override注解标记代码，程序也能够正常执行。那么，该注解表示什么？这么写有什么好处吗？事实上，@Override告诉编译器这个方法是一个重写方法(描述方法的元数据)，如果父类中不存在该方法，编译器便会报错，提示该方法没有重写父类中的方法。如果我不小心拼写错误，例如将toString()写成了toStrring(){double r}，而且我也没有使用@Override注解，那程序依然能编译运行。但运行结果会和我期望的大不相同。现在我们了解了什么是注解，并且使用注解有助于阅读程序。   
 <font color=red >Annotation是一种应用于类、方法、参数、变量、构造器及包声明中的特殊修饰符。它是一种由JSR-175标准选择用来描述元数据的一种工具。</font>
-####为什么要引入注解？
+
+#### 为什么要引入注解？
+
 使用Annotation之前(甚至在使用之后)，XML被广泛的应用于描述元数据。不知何时开始一些应用开发人员和架构师发现XML的维护越来越糟糕了。他们希望使用一些和代码紧耦合的东西，而不是像XML那样和代码是松耦合的(在某些情况下甚至是完全分离的)代码描述。如果你在Google中搜索“XML vs. annotations”，会看到许多关于这个问题的辩论。最有趣的是XML配置其实就是为了分离代码和配置而引入的。上述两种观点可能会让你很疑惑，两者观点似乎构成了一种循环，但各有利弊。下面我们通过一个例子来理解这两者的区别。  
 假如你想为应用设置很多的常量或参数，这种情况下，XML是一个很好的选择，因为它不会同特定的代码相连。如果你想把某个方法声明为服务，那么使用Annotation会更好一些，因为这种情况下需要注解和方法紧密耦合起来，开发人员也必须认识到这点。  
 另一个很重要的因素是Annotation定义了一种标准的描述元数据的方式。在这之前，开发人员通常使用他们自己的方式定义元数据。例如，使用标记interfaces，注释，transient关键字等等。每个程序员按照自己的方式定义元数据，而不像Annotation这种标准的方式。  
-目前，许多框架将XML和Annotation两种方式结合使用，平衡两者之间的利弊。  
-####Annotation是如何工作
+目前，许多框架将XML和Annotation两种方式结合使用，平衡两者之间的利弊。
+  
+#### Annotation是如何工作
+
 Annotations仅仅是元数据，和业务逻辑无关。理解起来有点困难，但就是这样。如果Annotations不包含业务逻辑，那么必须有人来实现这些逻辑。元数据的用户来做这个事情。Annotations仅仅提供它定义的属性(类/方法/包/域)的信息。Annotations的用户(同样是一些代码)来读取这些信息并实现必要的逻辑。  
 当我们使用Java的标注Annotations(例如@Override)时，JVM就是一个用户，它在字节码层面工作。到这里，应用开发人员还不能控制也不能使用自定义的注解。因此，我们讲解一下如何编写自定义的Annotations。  
 我们来逐个讲述编写自定义Annotations的要点。上面的例子中，你看到一些注解应用在注解上。  
@@ -1957,13 +1972,15 @@ J2SE5.0版本在 java.lang.annotation提供了四种元注解，专门注解其�
 
 >@Inherited – 定义该注释和子类的关系
 
-####注解的一些特性
+#### 注解的一些特性
+
 * 注解方法不能带有参数；
 * 注解方法返回值类型限定为：基本类型、String、Enums、Annotation或者是这些类型的数组；
 * 注解方法可以有默认值；
 * 注解本身能够包含元注解，元注解被用来注解其它注解。
 
-####内建注解
+#### 内建注解
+
 Java提供了三种内建注解。
 
 1. @Override——当我们想要复写父类中的方法时，我们需要使用该注解去告知编译器我们想要复写这个方法。这样一来当父类中的方法移除或者发生更改时编译器将提示错误信息。
@@ -1972,7 +1989,8 @@ Java提供了三种内建注解。
 
 而Android内建注解就比较多了，@Keep、@NonNull、@Nullable、@StringRes等等等等，非常之多，他们都在谷歌提供的support-annotations这个库里。
 
-##说说你对依赖注入的理解
+## 说说你对依赖注入的理解
+
 所谓依赖，举个例子说明，一个类Person，另一个类Car，如果Person的某个方法比如说drive，需要引用Car，则称Person类依赖于Car类，延伸到对象，这种依赖关系依然成立，比如说Person类的对象boy依赖于Car类的对象toyota。再讲讲这个drive方法的实现，假定代码如下：
 
 ```java
@@ -1986,6 +2004,7 @@ public void drive(){
 }
 }
 ```
+
 这其中的依赖关系，就导致了对象boy需要负责对象toyota的创建，甚至是整个生命周期的管理，而这样显然会带来耦合度高，不易维护等缺点，比如说要让这个男孩驾驶一辆Audi，则还需要修改类Person的代码。  
 因此在java的设计理论中就提出了一条非常著名的原则，依赖倒置原则（Dependence Inversion），其核心思想就是要将这种具体类之间的依赖，尽量转换成抽象依赖，也就是说类Person应该依赖于抽象类ICar，而不是具体的类 Car，这里java就大力推荐了抽象和接口的使用。    
 这个依赖倒置原则在设计模式也体现得非常多，比如说工厂模式和构建模式，个人认为控制反转IoC，其实也可以认为是实现这个原则的一种设计模式。控制反转，其中的控制这个词一直不太理解是什么意思，不过控制反转的另外一种说法也就是依赖注入（dependence injection），个人觉得更易于理解。还是以上文的boy与toyota为例，其核心就是要将boy依赖的对象toyota注入到boy中去，而无需boy自己去引用toyota，这个注入的过程，通常是由一个控制程序来完成的，无需对象去关心，举例如下：
@@ -2003,6 +2022,7 @@ public void drive(){
 }
 }
 ```
+
 这个时候，进行注入并且调用的过程，就很简单了，如下：
 
 ```java
@@ -2031,6 +2051,7 @@ public void setCar(ICar onecar){
 }
 }
 ```
+
 这个时候，进行注入并且调用的过程，就变成如下所示：
 
 ```java
