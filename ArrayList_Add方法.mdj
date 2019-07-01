@@ -1,0 +1,93 @@
+{
+	"_type": "Project",
+	"_id": "AAAAAAFF+h6SjaM2Hec=",
+	"name": "Untitled",
+	"ownedElements": [
+		{
+			"_type": "UMLModel",
+			"_id": "AAAAAAFF+qBWK6M3Z8Y=",
+			"_parent": {
+				"$ref": "AAAAAAFF+h6SjaM2Hec="
+			},
+			"name": "Model",
+			"ownedElements": [
+				{
+					"_type": "UMLClassDiagram",
+					"_id": "AAAAAAFF+qBtyKM79qY=",
+					"_parent": {
+						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
+					},
+					"name": "Main",
+					"defaultDiagram": true,
+					"ownedViews": [
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFroSl8mGum1m0=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"font": "Arial;13;0",
+							"left": 80,
+							"top": 96,
+							"width": 385,
+							"height": 100,
+							"text": "public boolean add(E e) {\n        ensureCapacityInternal(size + 1);  // Increments modCount!!\n        elementData[size++] = e;\n        return true;\n    }\n"
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFroSqehWu2qBo=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"font": "Arial;13;0",
+							"left": 80,
+							"top": 208,
+							"width": 449,
+							"height": 196,
+							"text": "private void ensureCapacityInternal(int minCapacity) {\n        if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {\n            minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);\n        }\n\n        ensureExplicitCapacity(minCapacity);\n    }\n\n    private void ensureExplicitCapacity(int minCapacity) {\n        modCount++;\n\n        // overflow-conscious code\n        if (minCapacity - elementData.length > 0)\n            grow(minCapacity);\n    }"
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFroSud32vBBsc=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"font": "Arial;13;0",
+							"left": 80,
+							"top": 416,
+							"width": 449,
+							"height": 185,
+							"text": "private void grow(int minCapacity) {\n        // overflow-conscious code\n        int oldCapacity = elementData.length;\n        int newCapacity = oldCapacity + (oldCapacity >> 1);\n        if (newCapacity - minCapacity < 0)\n            newCapacity = minCapacity;\n        if (newCapacity - MAX_ARRAY_SIZE > 0)\n            newCapacity = hugeCapacity(minCapacity);\n        // minCapacity is usually close to size, so this is a win:\n        elementData = Arrays.copyOf(elementData, newCapacity);\n    }"
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFroSy2QmvLkfs=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"font": "Arial;13;0",
+							"left": 72,
+							"top": 768,
+							"width": 633.22802734375,
+							"height": 273,
+							"text": "add方法调用机制 \n1.调用ensureCapacityInternal(列表容量大小+1)方法来确保数组容量大小 \n1.1 如果当前存放元素的数组为空实例数组，则最小容量大小是默认数组大小(10)和指定容量大小的最大值\n1.2 调用ensureExplicitCapacity(最小容量大小)方法来明确数组容量大小 \n2.ensureExplicitCapacity()\n2.1modCount++\n2.2如果指定容量的大小大于存放元素数组的大小则调用grow()方法\n3 grow()方法\n3.1存放元素数组的大小为旧的长度\n3.2旧的长度+旧的长度右移一位(相当于除以2),为新的长度\n3.3如果新的长度小于指定容量，则将指定的容量赋值给新的长度\n3.4如果新的长度大于默认最大的数组长度，则调用hugeCapacity(指定容量大小)方法，然后赋值给新的长度\n4.hugeCapacity()方法\n4.1如果指定的容量小于0,则抛出异常\n4.2如果指定的容量大于默认最大的数组长度，则取Integer.MAX_VALUE，否则取默认最大数组长度\n5.将存放元素的数组拷贝到新的的长度中并且赋值为存放元素数组\n6.将存放元素的数组列表容量大小+1索引处的值赋值为需要添加的元素"
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFroUPo32vX7Ag=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"font": "Arial;13;0",
+							"left": 80,
+							"top": 624,
+							"width": 448,
+							"height": 115,
+							"text": "private static int hugeCapacity(int minCapacity) {\n        if (minCapacity < 0) // overflow\n            throw new OutOfMemoryError();\n        return (minCapacity > MAX_ARRAY_SIZE) ?\n            Integer.MAX_VALUE :\n            MAX_ARRAY_SIZE;\n    }"
+						}
+					]
+				}
+			]
+		}
+	]
+}
