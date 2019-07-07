@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/linked_list/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/array_list/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/array_list/Test.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/array_list/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/array_list/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Java高级知识.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java高级知识.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../数据结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/../数据结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../设计模式.md" beforeDir="false" afterPath="$PROJECT_DIR$/../设计模式.md" afterDir="false" />
-    </list>
+    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -479,7 +471,7 @@
       <workItem from="1562074934350" duration="3032000" />
       <workItem from="1562123811686" duration="667000" />
       <workItem from="1562162482489" duration="405000" />
-      <workItem from="1562251762877" duration="3988000" />
+      <workItem from="1562251762877" duration="4426000" />
     </task>
     <servers />
   </component>
@@ -516,7 +508,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="162781000" />
+    <option name="totallyTimeSpent" value="163219000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="805" extended-state="6" />
@@ -531,7 +523,7 @@
       <window_info id="Favorites" order="6" sideWeight="0.6685083" side_tool="true" weight="0.26037195" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32908705" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49946752" visible="true" weight="0.10869565" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49946752" weight="0.10869565" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946752" weight="0.067919075" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
