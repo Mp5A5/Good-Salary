@@ -2,11 +2,85 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/collection/HashTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/markdown-navigator/profiles_settings.xml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Test.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/node/Node.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/HungrySingleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/LazyCASSingleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/LazyClazzSingleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/LazyDCLSingleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/BubbleSort.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/MergeSort.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/QuickSort.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/ShellSort.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/Demo01.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/Dispatch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/DynamicDispatch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/StaticDispatch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Cat.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/CockerSpaniel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Dog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Friendly.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Tester.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jvm/stack/StackDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/Lock.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/SpinLock.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/consumer/TestProductConsumerLock.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/consumer/TestProductConsumerSny.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/dead/DeadLock.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/dead/SynThread1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/dead/SyncThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/test/TestLock.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lock/test/Ticket.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/hungry/Singleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/hungry/SingletonEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonBase.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonCAS.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonClazz.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonDCL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonSyn.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/singleton/test/Singleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/CallableTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/RTDifferThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/RunnableDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/RunnableTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/TestVolatile.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/ThreadDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/ThreadJoinDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/ThreadLocalDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/ThreadSleepDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/ThreadTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/VolatileDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ErrorThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/Interrupted.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/Test.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ThreadFlagUnSafe.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ThreadStopSafeInterrupted.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ThreadStopUnSafe.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/control/SemaphoreThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/poll/CachedThreadPool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/priority/ThreadPriorityDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/sleep/Service.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/sleep/SleepThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/sleep/Test.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/sleep/WaitThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/syn/CountDownLatchTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/syn/CyclicBarrierTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/syn/MySynchronizerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/syn/SyncMethodTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/syn/ThreadLocalTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/wait/Service.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/wait/SleepThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/wait/Test.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/wait/WaitThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/thread/yield/ThreadYieldDemo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/collection/HashTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/collection/HashTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/collection/HashTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/collection/HashTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pic/p25.png" beforeDir="false" afterPath="$PROJECT_DIR$/../pic/p25.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../关键字.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../数据结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/../数据结构.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../设计模式.md" beforeDir="false" afterPath="$PROJECT_DIR$/../设计模式.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,6 +91,20 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Good_Salary$Java_02.ic" NAME="Java_02 Coverage Results" MODIFIED="1556181236551" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
   </component>
@@ -26,8 +114,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Kotlin File" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -47,7 +135,7 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1556196157901" />
     <property name="extract.method.default.visibility" value="private" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/lock/consumer" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -59,20 +147,24 @@
     <property name="project.structure.last.edited" value="Problems" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="editing.templates" />
+    <property name="settings.editor.selected.configurable" value="fileTemplates" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/recover" />
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/lock/consumer" />
+      <recent name="$PROJECT_DIR$/src/thread/wait" />
+      <recent name="$PROJECT_DIR$/src/thread" />
+      <recent name="$PROJECT_DIR$/src/wait" />
+      <recent name="$PROJECT_DIR$/src" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="thread.breakThread" />
       <recent name="clone" />
       <recent name="" />
       <recent name="proxy" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src" />
-      <recent name="$PROJECT_DIR$/src/annotation" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/recover" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -87,20 +179,20 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.HashTest">
+  <component name="RunManager" selected="Application.Test">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Func" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="array_list.Func" />
+    <configuration name="Dispatch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="jvm.Dispatch" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="array_list.*" />
+          <option name="PATTERN" value="jvm.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -108,13 +200,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="HashTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="collection.HashTest" />
+    <configuration name="DynamicDispatch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="jvm.DynamicDispatch" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="collection.*" />
+          <option name="PATTERN" value="jvm.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -122,27 +214,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test (2)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="think_in_java.Test" />
+    <configuration name="StaticDispatch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="jvm.StaticDispatch" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="think_in_java.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test (3)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="linked_list.Test" />
-      <module name="Good Salary" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="linked_list.*" />
+          <option name="PATTERN" value="jvm.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -151,12 +229,20 @@
       </method>
     </configuration>
     <configuration name="Test" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="array_list.Test" />
+      <option name="MAIN_CLASS_NAME" value="Test" />
+      <module name="Good Salary" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Tester" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="jvm.dynamic.Tester" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="array_list.*" />
+          <option name="PATTERN" value="jvm.dynamic.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -197,13 +283,16 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.HashTest" />
-        <item itemvalue="Application.Test (3)" />
         <item itemvalue="Application.Test" />
-        <item itemvalue="Application.Func" />
-        <item itemvalue="Application.Test (2)" />
+        <item itemvalue="Application.Tester" />
+        <item itemvalue="Application.Dispatch" />
+        <item itemvalue="Application.DynamicDispatch" />
+        <item itemvalue="Application.StaticDispatch" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -269,40 +358,25 @@
       <workItem from="1565142922030" duration="315000" />
       <workItem from="1565161608585" duration="4610000" />
       <workItem from="1565237757792" duration="4152000" />
+      <workItem from="1565337816137" duration="3888000" />
+      <workItem from="1565590836957" duration="5224000" />
+      <workItem from="1565922645987" duration="2105000" />
+      <workItem from="1566093494382" duration="5443000" />
+      <workItem from="1566266255762" duration="17688000" />
+      <workItem from="1566365705573" duration="3819000" />
+      <workItem from="1566463631539" duration="3691000" />
+      <workItem from="1566550362477" duration="8085000" />
+      <workItem from="1566802225233" duration="11567000" />
+      <workItem from="1566993529082" duration="878000" />
+      <workItem from="1566994423785" duration="800000" />
+      <workItem from="1567067200588" duration="11916000" />
+      <workItem from="1567300639630" duration="9000" />
+      <workItem from="1567304560504" duration="29152000" />
+      <workItem from="1567701008584" duration="7383000" />
+      <workItem from="1569402501099" duration="670000" />
+      <workItem from="1569467806438" duration="3538000" />
     </task>
     <servers />
-  </component>
-  <component name="TestHistory">
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 13m 59s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 14m 36s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 14m 54s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 15m 41s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 15m 44s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 17m 22s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 25m 54s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Java_10_02_InnerClass_execute - 2019.05.14 at 15h 26m 09s.xml">
-      <configuration name="Java_10_02_InnerClass.execute" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestReflection_testReflection - 2019.05.21 at 18h 12m 59s.xml">
-      <configuration name="TestReflection.testReflection" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="Polymorphism_main - 2019.06.21 at 07h 56m 26s.xml">
-      <configuration name="Polymorphism.main" configurationId="JUnit" />
-    </history-entry>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -352,6 +426,11 @@
           <url>jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home/src.zip!/java/util/ArrayList.java</url>
           <line>724</line>
           <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home/src.zip!/java/lang/ThreadLocal.java</url>
+          <line>200</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -442,5 +521,55 @@
         </settings>
       </state>
     </states>
+  </component>
+  <component name="simpleUML.UMLToolWindowPlugin">
+    <General>
+      <option name="birdViewUpdateDelay" value="2000" />
+      <option name="defaultFileLocation" value="file://$PROJECT_DIR$/.." />
+    </General>
+    <Classdiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="defaultFieldsExpanded" value="false" />
+      <option name="defaultContructorsExpanded" value="false" />
+      <option name="defaultMethodsExpanded" value="false" />
+      <option name="showParameters" value="true" />
+      <option name="showTooltip" value="true" />
+      <option name="showReturnValues" value="true" />
+      <option name="longModifier" value="true" />
+      <option name="implementsBehaviour" value="1" />
+      <option name="extendsBehaviour" value="1" />
+      <option name="compartmentBehaviour" value="1" />
+      <option name="interfaceBackgroundColor" value="-6494306" />
+      <option name="abstractClassBackgroundColor" value="-1580132" />
+      <option name="classBackgroundColor" value="-6508057" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="quickSourceLinkColor" value="-16776961" />
+      <option name="quickDiagramLinkColor" value="-8454144" />
+      <option name="drawDecorations" value="false" />
+      <option name="hideFieldList" value="" />
+      <option name="showFieldList" value="" />
+      <option name="hideConstructorList" value="" />
+      <option name="showConstructorList" value="" />
+      <option name="hideMethodList" value="" />
+      <option name="showMethodList" value="" />
+      <option name="minimumFigureSize" value="0,0" />
+    </Classdiagram>
+    <Dependencydiagram>
+      <option name="diagramTitleFont" value="SansSerif,1,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="0" />
+    </Dependencydiagram>
+    <Packagediagram>
+      <option name="diagramTitleFont" value="SansSerif,0,12" />
+      <option name="diagramFont" value="SansSerif,0,10" />
+      <option name="packageBackgroundColor" value="-4144960" />
+      <option name="diagramBackgroundColor" value="-1" />
+      <option name="useAntialiasedConnectors" value="true" />
+      <option name="packageNameCompressionLevel" value="2" />
+    </Packagediagram>
   </component>
 </project>

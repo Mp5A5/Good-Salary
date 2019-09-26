@@ -1,15 +1,21 @@
 package collection;
 
+import org.junit.jupiter.api.Test;
 import sun.misc.Unsafe;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Integer.toBinaryString;
 
 /** 作者：王文彬 on 2019-07-26 08：07 邮箱：wwb199055@126.com */
 public class HashTest {
+
+  private volatile int mINt = 100;
+
+  private static Object[] mBigArray;
+
+  private static Object[] mBaseCache;
 
   public static void main(String[] args) {
     /*final int max = Integer.MAX_VALUE >>> 4;
@@ -29,26 +35,34 @@ public class HashTest {
 
     Unsafe unsafe = Unsafe.getUnsafe();*/
 
-    System.out.println(Integer.numberOfLeadingZeros(64) | (1 << (16 - 1)));
-    /*System.out.println(Integer.numberOfLeadingZeros(16));*/
+    /*System.out.println(Integer.numberOfLeadingZeros(64));
 
-    int i = Integer.numberOfLeadingZeros(16) | (1 << (16 - 1));
+    LinkedHashMap<Integer,String> map = new LinkedHashMap<>();
+    map.remove("a");*/
 
-    System.out.println(16 >>> 3);
+    Object[] mArray = new Object[2];
 
-    /*int stride;
-    int NCPU = 3;
-    int n = 16;
-    int MIN_TRANSFER_STRIDE = 16;
+    int[] ints = {0, 1, 2, 3};
 
-    if ((stride = (NCPU > 1) ? (n >>> 3) / NCPU : n)< MIN_TRANSFER_STRIDE) ;*/
+    Object[] objects = {"a", 3, "5"};
 
-   for (int j=0;;){
-     j++;
-     if (j==5){
-       return;
-     }
-      System.out.println(j);
-   }
+    mArray[0] = ints;
+
+    mArray[1] = objects;
+
+    mBigArray = mArray;
+
+    final Object[] array = mBigArray;
+
+    mBaseCache = (Object[]) array[1];
+
+    array[0] = null;
+
+    System.out.println(Arrays.toString((int[]) array[0]));
+    System.out.println(Arrays.toString((int[]) mBigArray[0]));
+    System.out.println(Arrays.toString(mBaseCache));
+
+    System.out.println(~-1);
+
   }
 }
