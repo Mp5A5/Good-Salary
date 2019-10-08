@@ -4224,36 +4224,763 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 
 ## Android View 绘制流程 & 自定义View
 
-1、View绘制流程调用链图
+一、ViewRoot和DecorView
 
-![image](pic/p352.png)
+1、ViewRoot对应于ViewRootImp类，它是连接WindowManager和DecorView的纽带，View的三大流程均是通过ViewRoot来完成的。在ActivityThread中，当Activity对象被创建完毕后，会将DecorView添加到Window中，同时会创建ViewRootImp对象，并将ViewRootImp对象和DecorView建立关联，这个过程如下：
 
-根据调用链，可将整个绘制过程分为三部分：Measure - Layout - Draw
+![image](pic/p400.png)
 
-一、Measure 过程
+2、View的绘制流程:
 
-1. 测量过程由上至下，在measure过程的最后，每个视图将存储自己的尺寸大小和测量规格。
-2. measure过程会为一个View及其所有子节点的mMeasureWidth和mMeasuredHeight变量赋值， 该值可以通过getMeasuredWidth和getMeasuredHeight方法获得。
-3. measure过程的核心方法: measure() - onMeasure() - setMeasuredDimension().  
+从ViewRoot的performTraversals方法开始
 
-* setMeasuredDimension是测量阶段的终极方法，在onMeasure()方法中调用，将计算得到的尺寸，传递给该方法，测量阶段结束。在自定义视图时，不需要关心系统复杂的Measure过程，只需要调用setMeasuredDimension()设置根据MeasureSpec计算得到的尺寸即可。同时,onMeasure()方法也必须调用setMeasuredDimension()方法来设置重新测量之后的
+1. measure:用来测量View的宽高
+2. layout:来确定View在父容器的放置位置
+3. draw:负责将View绘制在屏幕上。
 
-以measureChildren为例的调用链图:
+3、performTraversals的绘制流程如图：
 
-![image](pic/p353.png)
+![image](pic/p401.png)
 
-二、Layout 过程
+1. performTraversals会依次调用performMeasure、performLayout、performDraw，这三个方法，这三个方法分别完成顶级View的measure、、layout、draw这三个流程
+2. 其中在performMeasure会调用measure方法，在measure方法中又会调用onMeasure方法，在onMeasure方法中则会对所有的子元素进行measure过程，这个时候measure流程就从父容器传递到子元素中了，这样就完成了一次measure过程。接着子元素会重复父容器的measure过程，如此反复就完成了整个View树的遍历。
+3. 同理performLayout和performDraw的传递流程和performMeasure是类似的，唯一不同的是，performDraw的传递过程是在draw方法中通过dispatch来实现的。
 
-1. 子视图的具体位置都是相对于父视图而言的。View的onLayout()方法为空实现，而ViewGroup的onLayout为abstract，因此，自定义的View要继承ViewGroup时，必须实现onLayout函数。
-2. 在Layout过程中，子视图会调用getMeasuredWidth()和getMeasuredHeight()方法获取到measure过程得到mMeasuredWidth和mMeasuredHeight，作为自己的width和height。然后调用每一个子视图的layout()，来确定每个子视图在父视图中的位置。
+注意：
 
-三、Draw 过程
+* measure的过程决定了View的宽高，Measure完成以后，可以通过getMeasuredWidth和getMeasuredHeight方法来获取到View测量后的宽高，在几乎所有的情况下他都等同于View最终的宽高，但是特殊情况除外。
+* Layout过程决定了View的四个顶点的坐标和实际View的宽高，完成以后，可以通过getTop、getBottom、getLeft、getRight来拿到View的四个顶点的位置，并可以通过getWith和getHeight方法拿到View的最终宽高。
+* Draw过程决定了View的显示，只有draw方法完成以后View的内容才能呈现在屏幕上。
 
-1. 所有视图最终都是调用View的draw方法进行绘制。 在自定义视图中，也不应该复写该方法，而是复写onDraw（）方法进行绘制，如果自定义的视图确实要复写该方法，先调用super.draw()完成系统的绘制，再进行自定义的绘制。
-2. onDraw()方法默认是空实现，自定义绘制过程需要复写方法，绘制自身的内容。
-3. dispatchDraw()发起对子视图的绘制，在View中默认为空实现，ViewGroup复写了dispatchDraw()来对其子视图进行绘制。自定义的ViewGroup不应该对dispatchDraw()进行复写。
+4、顶级View：DecorView
 
-如何对自定义View进行控制
+![image](pic/p402.png)
+
+DecorView作为顶级View，其实是一个的FrameLayout ，它包含一个竖直方向的LinearLayout，这个 LinearLayout分为标题栏和内容栏两个部分。在Activity通过setContextView所设置的布局文件其实就是被加载到内容栏之中的。这个内容栏的id 是 R.android.id.content ，通过 ViewGroup content = findViewById(R.android.id.content); 可以得到这个contentView，通过content.getChildAt(0)可以得到我们自己设置的View。View层的事件都是先经 过DecorView，然后才传递到子View。
+
+二、理解MeasureSpec
+
+测量过程中，系统将View的 LayoutParams 根据父容器所施加的规则转换成对应的 MeasureSpec，然后根据这个MeasureSpec来测量出View的宽高。这里宽高是测量宽高，不一定等于View最终的宽高。
+
+1、MeasureSpec
+
+1.MeasureSpec代表一个32位int值，高2位代表SpecMode（测量模式），低30位代表 SpecSize（在某个测量模式下的规格大小）
+
+```
+private static final int MODE_SHIFT = 30;
+private static final int MODE_MASK  = 0x3 << MODE_SHIFT;
+public static final int UNSPECIFIED = 0 << MODE_SHIFT;
+public static final int EXACTLY     = 1 << MODE_SHIFT;
+public static final int AT_MOST     = 2 << MODE_SHIFT;
+...
+public static int makeMeasureSpec(int size,int mode) {
+    if (sUseBrokenMakeMeasureSpec) {
+        return size + mode;
+    } else {
+        return (size & ~MODE_MASK) | (mode & MODE_MASK);
+    }
+}
+...
+public static int getMode(int measureSpec) {
+    //noinspection ResourceType
+    return (measureSpec & MODE_MASK);
+}
+      
+public static int getSize(int measureSpec) {
+    return (measureSpec & ~MODE_MASK);
+}        
+```
+
+2.SpecMode有三种：
+
+1. UNSPECIFIED ：父容器对View不进行任何限制，要多大给多大，一般用于系统内部，表示一种测量状态
+2. EXACTLY：父容器检测到View所需要的精确大小，这时候View的最终大小就是SpecSize所指定的值，对应LayoutParams中的match_parent和具体数值这两种模式
+3. AT_MOST ：对应View的默认⼤大⼩小，不不同View实现不不同，View的⼤大⼩小不不能⼤大于⽗父容 器器 的SpecSize，对应 LayoutParams 中的 wrap_content
+
+3.MeasureSpec和LayoutParams的对应关系
+
+View测量的时候，系统会将LayoutParams在父容器的约束下转换成对应的MeasureSpec，然后再根据这个MeasureSpec来确定View测量后的宽高。
+
+View的MeasureSpec由父容器的MeasureSpec和自身的LayoutParams共同决定。
+
+顶级View（DecorView）和普通View的MeasureSpec转换略不同。
+
+* DecorView：MeasureSpec由窗口尺寸和自身的LayoutParams共同确定。
+* 普通View：MeasureSpec由父容器的MeasureSpec和自身LayoutParams共同确定。
+
+MeasureSpec一旦确定，onMeasure中就可以确定View的测量宽高
+
+DecorView在ViewRootImpl中measureHierarchy方法中展示了DecorView的MeasureSpec创建过程，其中desiredWindowWidth和desiredWindowHeight是屏幕尺寸：
+
+```
+childWidthMeasureSpec = getRootMeasureSpec(desiredWindowWidth, lp.width);
+childHeightMeasureSpec = getRootMeasureSpec(desiredWindowHeight, lp.height);
+
+private static int getRootMeasureSpec(int windowSize, int rootDimension) {
+    int measureSpec;
+    switch (rootDimension) {
+
+    case ViewGroup.LayoutParams.MATCH_PARENT:
+        // Window can't resize. Force root view to be windowSize.
+        measureSpec = MeasureSpec.makeMeasureSpec(windowSize, MeasureSpec.EXACTLY);
+        break;
+    case ViewGroup.LayoutParams.WRAP_CONTENT:
+        // Window can resize. Set max size for root view.
+        measureSpec = MeasureSpec.makeMeasureSpec(windowSize, MeasureSpec.AT_MOST);
+        break;
+    default:
+        // Window wants to be an exact size. Force root view to be that size.
+        measureSpec = MeasureSpec.makeMeasureSpec(rootDimension, MeasureSpec.EXACTLY);
+        break;
+    }
+    return measureSpec;
+}
+```
+通过上述代码:DecorView的MeasureSpec产生过程遵循如下规则，根据它的LayoutParams中的宽高来划分。
+
+* LayoutParams.MATCH_PARENT：精确模式，大小就是窗口大小
+* LayoutParams.WRAP_CONTENT：最大模式，大小不定，但是不能超过窗口大小
+* 固定大小：精确模式，大小为LayoutParams中指定的大小
+
+普通View(我们布局中的View)，View的measure过程由ViewGroup传递
+
+* ViewGroup的measureChildWithMargins
+
+```
+protected void measureChildWithMargins(View child,
+            int parentWidthMeasureSpec, int widthUsed,
+            int parentHeightMeasureSpec, int heightUsed) {
+    final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+    final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+            mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin
+                    + widthUsed, lp.width);
+    final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+            mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin
+                    + heightUsed, lp.height);
+
+    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+}
+```
+
+上述方法会对子元素进行measure，在调用子元素measure方法之前会通过getChildMeasureSpec方法得到子元素的MeasureSpec。
+子元素的MeasureSpec的创建与父容器的MeasureSpec和子元素本身LayoutParams有关，还和View的margin及Padding有关。
+
+```
+public static int getChildMeasureSpec(int spec, int padding, int childDimension) {
+    int specMode = MeasureSpec.getMode(spec);
+    int specSize = MeasureSpec.getSize(spec);
+
+    int size = Math.max(0, specSize - padding);
+
+    int resultSize = 0;
+    int resultMode = 0;
+
+    switch (specMode) {
+    // Parent has imposed an exact size on us
+    case MeasureSpec.EXACTLY:
+        if (childDimension >= 0) {
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size. So be it.
+            resultSize = size;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size. It can't be
+            // bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        }
+        break;
+
+    // Parent has imposed a maximum size on us
+    case MeasureSpec.AT_MOST:
+        if (childDimension >= 0) {
+            // Child wants a specific size... so be it
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size, but our size is not fixed.
+            // Constrain child to not be bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size. It can't be
+            // bigger than us.
+            resultSize = size;
+            resultMode = MeasureSpec.AT_MOST;
+        }
+        break;
+
+    // Parent asked to see how big we want to be
+    case MeasureSpec.UNSPECIFIED:
+        if (childDimension >= 0) {
+            // Child wants a specific size... let him have it
+            resultSize = childDimension;
+            resultMode = MeasureSpec.EXACTLY;
+        } else if (childDimension == LayoutParams.MATCH_PARENT) {
+            // Child wants to be our size... find out how big it should
+            // be
+            resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
+            resultMode = MeasureSpec.UNSPECIFIED;
+        } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+            // Child wants to determine its own size.... find out how
+            // big it should be
+            resultSize = View.sUseZeroUnspecifiedMeasureSpec ? 0 : size;
+            resultMode = MeasureSpec.UNSPECIFIED;
+        }
+        break;
+    }
+    //noinspection ResourceType
+    return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
+}
+```
+
+getChildMeasureSpec清楚地展示了普通View的MeasureSpec的创建规则，是根据父容器的MeasureSpec同时结合View自身的LayoutParams来确定子元素的MeasureSpec
+
+![image](pic/p403.png)
+
+规则：
+
+1. 当View采用固定宽/高时（即设置固定的dp/px）,不管父容器的MeasureSpec是什么， View的MeasureSpec都是EXACTLY模式，并且大小遵循我们设置的值。
+2. 当View的宽/高是 match_parent 时，View的MeasureSpec都是EXACTLY模式并且其大小等于父容器的剩余空间。
+3. 当View的宽/高是 wrap_content时，View的MeasureSpec都是AT_MOST模式并且其大小不能超过父容器的剩余空间。
+4. 父容器的UNSPECIFIED模式，一般用于系统内部多次Measure时，表示一种测量的状态，一般来说我们不需要关注此模式。
+
+三、View的工作流程
+
+1、measure过程
+
+分两种情况：
+
+* View：通过 measure 方法就完成了测量过程
+* ViewGroup：除了完成自己的测量过程还会便利调用所有子View的measure方法，而且各个子View还会递归执行这个过程。
+
+1.View的measure过程
+
+* View的measure过程由measure方法来完成，measure方法是一个final类型的方法，意味着不能重写，它会调用View的onMeasure方法。
+
+```
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),
+            getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));
+}
+```
+
+setMeasuredDimension方法会设置View的宽高的测量值
+
+```
+public static int getDefaultSize(int size, int measureSpec) {
+    int result = size;
+    int specMode = MeasureSpec.getMode(measureSpec);
+    int specSize = MeasureSpec.getSize(measureSpec);
+
+    switch (specMode) {
+    case MeasureSpec.UNSPECIFIED:
+        result = size;
+        break;
+    case MeasureSpec.AT_MOST:
+    case MeasureSpec.EXACTLY:
+        result = specSize;
+        break;
+    }
+    return result;
+}
+```
+MeasureSpec.AT_MOST/MeasureSpec.EXACTLY模式：getDefaultSize返回的大小就是MeasureSpec中的specSize，这个specSize就是View测量后的大小（这里提到的的测量后的大小，是因为View最终的大小是在layout阶段确定的，所以要加以区分，但是几乎所有情况下View的测量大小和最终大小是相等的）
+
+MeasureSpec.UNSPECIFIED：一般用于系统内部的测量，getDefaultSize返回的大小为它的第一个参数size，即宽高为getSuggestedMinimumWidth和getSuggestedMinimumHeight
+
+```
+protected int getSuggestedMinimumWidth() {
+    return (mBackground == null) ? mMinWidth : max(mMinWidth, mBackground.getMinimumWidth());
+}
+
+protected int getSuggestedMinimumHeight() {
+    return (mBackground == null) ? mMinHeight : max(mMinHeight, mBackground.getMinimumHeight());
+}
+
+//android/graphics/drawable/Drawable.java
+// 返回Drawable的原始宽度，前提是这个Drawable有原始宽度，否则为0
+public int getMinimumWidth() {
+    final int intrinsicWidth = getIntrinsicWidth();
+    return intrinsicWidth > 0 ? intrinsicWidth : 0;
+}
+```
+
+通过getSuggestedMinimumWidth方法可以看出：
+
+* 如果View没有设置背景，那么View的宽高为mMinWidth(对应于android:minWidth这个属性所指的值，这个属性如果不指定则默认为0)
+* 如果View设置了背景，那么View的宽度为max(mMinWidth, mBackground.getMinimumWidth())(返回Drawable的原始宽度，前提是这个Drawable有原始宽度，否则为0)
+
+总结：getSuggestedMinimumWidth逻辑
+
+1. 如果View没有设置背景，那么返回android:minWidth这个属性所指定的值，这个值可以为0
+2. 如果View设置了背景，那么返回android:minWidth和北京最小宽度这两者中最大的值
+
+getSuggestedMinimumWidth和getSuggestedMinimumHeight的返回值就是View在UNSPECIFIED情况下的测量宽高
+
+总结：View的宽高由specSize决定
+
+直接继承View的自定义控件需要重写onMeasure方法并设置wrap_content(即specMode是AT_MOST模式）时的自身大小，否则在布局中使用 wrap_content相当于使用match_parent 。对于非 wrap_content 的情形，我们沿用系统的测量值即可。
+
+原因：根据getDefaultSize方法和表4-1(普通View的MeasureSpec创建规则)，如果布局中使用wrap_content，那么它的speckMode是AT_MOST模式，在这种模式下，它的宽高等于specSize，查表可知，这种情况下View的speckSize是parentSize，而parentSize的父容器中可以使用的大小，也就是父容器中当前剩余的空间大小。很显然View的宽高就等于父容器当前剩余的空间大小，这种效果和布局中match_parent完全一致。
+解决问题方法：
+
+```
+@Override
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    int widthSpaceSize = MeasureSpec.getSize(widthMeasureSpec);
+    int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+    int heightSpaceSize = MeasureSpec.getSize(heightMeasureSpec);
+    int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+    if(widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.AT_MOST){
+    	setMeasuredDimension(mWidth,mHeight);
+    } else if(widthSpecMode == MeasureSpec.AT_MOST){
+    	setMeasuredDimension(mWidth,heightSpaceSize);
+    } else if(heightSpecMode == MeasureSpec.AT_MOST){
+    	setMeasuredDimension(widthSpaceSize, mHeight);
+	 }
+}	 
+```
+
+2.ViewGroup的measure过程
+
+ViewGroup是一个抽象类，没有重写View的 onMeasure 方法，但是它提供了一个 measureChildren 方法。这是因为不同的ViewGroup子类有不同的布局特性，导致他们的测量细节各不相同，比如 LinearLayout 和 RelativeLayout,因此ViewGroup没办法统一实现onMeasure方法。
+
+* measureChildren：
+
+```
+protected void measureChildren(int widthMeasureSpec, int heightMeasureSpec) {
+    final int size = mChildrenCount;
+    final View[] children = mChildren;
+    for (int i = 0; i < size; ++i) {
+        final View child = children[i];
+        if ((child.mViewFlags & VISIBILITY_MASK) != GONE) {
+            measureChild(child, widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+}
+```
+
+ViewGroup在measure时，会对每一个子元素进行measure
+
+```
+protected void measureChild(View child, int parentWidthMeasureSpec,
+            int parentHeightMeasureSpec) {
+    final LayoutParams lp = child.getLayoutParams();
+
+    final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+            mPaddingLeft + mPaddingRight, lp.width);
+    final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+            mPaddingTop + mPaddingBottom, lp.height);
+
+    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+}
+```	
+measureChildren方法的流程：
+
+1. measureChild取出子元素的LayoutParams
+2. 通过getChildMeasureSpec来创建子元素的MeasureSpec
+3. 传递给View的measure方法来进行测量。
+
+通过LinearLayout的onMeasure方法里来分析ViewGroup的measure过程
+
+```
+protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    if (mOrientation == VERTICAL) {
+        measureVertical(widthMeasureSpec, heightMeasureSpec);
+    } else {
+        measureHorizontal(widthMeasureSpec, heightMeasureSpec);
+    }
+}
+```
+
+查看垂直布局
+
+```
+// See how tall everyone is. Also remember max width.
+for (int i = 0; i < count; ++i) {
+    final View child = getVirtualChildAt(i);
+    ...
+    // Determine how big this child would like to be. If this or
+    // previous children have given a weight, then we allow it to
+    // use all available space (and we will shrink things later
+    // if needed).
+    ...
+    measureChildBeforeLayout(child, i, widthMeasureSpec, 0, heightMeasureSpec, usedHeight);
+    final int childHeight = child.getMeasuredHeight();
+    ...
+    final int totalLength = mTotalLength;
+    mTotalLength = Math.max(totalLength, totalLength + childHeight + lp.topMargin +
+           lp.bottomMargin + getNextLocationOffset(child));        
+```
+
+遍历子元素并对每个子元素执行measureChildBeforeLayout方法，这个方法内部会调用子元素的measure方法，这样每个子元素就依次进入measure方法，并且通过mTotalLength这个变量来存储LinearLayout在竖直方向的初始高度，每测量一个子元素，mTotalLength就会增加，增加的部分主要包括子元素的高度以及子元素在处置方向上的margin等。当子元素测量完毕后，LinearLayout会测量自己的大小。
+
+```
+// Add in our padding
+mTotalLength += mPaddingTop + mPaddingBottom;
+
+int heightSize = mTotalLength;
+
+// Check against our minimum height
+heightSize = Math.max(heightSize, getSuggestedMinimumHeight());
+
+// Reconcile our calculated size with the heightMeasureSpec
+int heightSizeAndState = resolveSizeAndState(heightSize, heightMeasureSpec, 0);
+heightSize = heightSizeAndState & MEASURED_SIZE_MASK;
+...
+setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState), heightSizeAndState);
+```
+
+在水平方向测量遵循View测量过程，在竖直方向的测量过程：
+
+1. 如果布局高度采用的是match_parent或者具体数值，那么测量过程和View一致，即高度为specSize
+2. 如果布局高度采用的是wrap_content，那么它的高度是所有子元素占用的高度总和，但是任然不能超过父容器的剩余空间，还要考虑竖直方向上的padding
+
+```
+public static int resolveSizeAndState(int size, int measureSpec, int childMeasuredState) {
+    final int specMode = MeasureSpec.getMode(measureSpec);
+    final int specSize = MeasureSpec.getSize(measureSpec);
+    final int result;
+    switch (specMode) {
+        case MeasureSpec.AT_MOST:
+            if (specSize < size) {
+                result = specSize | MEASURED_STATE_TOO_SMALL;
+            } else {
+                result = size;
+            }
+            break;
+        case MeasureSpec.EXACTLY:
+            result = specSize;
+            break;
+        case MeasureSpec.UNSPECIFIED:
+        default:
+            result = size;
+    }
+    return result | (childMeasuredState & MEASURED_STATE_MASK);
+}
+```
+
+View的measure总结：
+
+View的measure过程是三大流程中最复杂的一个，measure完成以后，通过 getMeasuredWidth/Height 方法就可以正确获取到View的测量后宽/高。在某些情况下，系统可能需要多次measure才能确定最终的测量宽/高，所以在onMeasure中拿到的宽/高很可能不是准确的。同时View的measure过程和Activity的生命周期并不是同步执行，因此无法保证在 Activity的 onCreate、onStart、onResume时某个View就已经测量完毕。所以有以下四种方式来获取View的宽高：
+
+1.  Activity/View#onWindowFocusChanged。 onWindowFocusChanged这个方法的含义是：VieW已经初始化完毕了，宽高已经准备好了，需要注意：它会被调用多次，当Activity的窗口得到焦点和失去焦点均会被调用。
+
+```
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+        int width = view.getMeasuredWidth();
+        int height = view.getMeasuredHeight();
+        Log.d(TAG, "onWindowFocusChanged, width= " + view.getMeasuredWidth() + " height= " + view.getMeasuredHeight());
+    }
+}
+```
+
+2. view.post(runnable)。 通过post将一个runnable投递到消息队列的尾部，当Looper调用此 runnable的时候，View也初始化好了。
+
+```
+@Override
+protected void onStart() {
+    super.onStart();
+    view.post(new Runnable() {
+
+        @Override
+        public void run() {
+            int width = view.getMeasuredWidth();
+            int height = view.getMeasuredHeight();
+        }
+    });
+}
+```
+
+3. ViewTreeObserver。 使用 ViewTreeObserver 的众多回调可以完成这个功能，比如OnGlobalLayoutListener这个接口，当View树的状态发生改变或View树内部的View的可见性发生改变时，onGlobalLayout 方法会被回调。需要注意的是，伴随着View树状态onGlobalLayout会被回调多次。
+
+```
+@Override
+protected void onStart() {
+    super.onStart();
+
+    ViewTreeObserver observer = view.getViewTreeObserver();
+    observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+
+        @SuppressWarnings("deprecation")
+        @Override
+        public void onGlobalLayout() {
+            view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            int width = view.getMeasuredWidth();
+            int height = view.getMeasuredHeight();
+        }
+    });
+}
+```
+
+4. view.measure(int widthMeasureSpec,int heightMeasureSpec)，通过手动对View进行measure来得到View的宽高。
+
+* match_parent： 无法measure出具体的宽高，因为不知道父容器的剩余空间即无法知道parentSize的大小，无法测量出View的大小，直接放弃
+* 具体的数值（dp/px）：
+
+比如宽高都是100px，measure如下
+
+```
+int widthMeasureSpec = MeasureSpec.makeMeasureSpec(100,MeasureSpec.EXACTLY);
+int heightMeasureSpec = MeasureSpec.makeMeasureSpec(100,MeasureSpec.EXACTLY);
+view.measure(widthMeasureSpec,heightMeasureSpec);
+```
+
+* wrap_content：
+
+```
+int widthMeasureSpec = MeasureSpec.makeMeasureSpec((1<<30)-1,MeasureSpec.AT_MOST);
+// View的尺寸使用30位二进制表示，最大值30个1，在AT_MOST模式下，我们用View理论上能支持的最大值去构造MeasureSpec是合理的
+int heightMeasureSpec = MeasureSpec.makeMeasureSpec((1<<30)-1,MeasureSpec.AT_MOST);
+view.measure(widthMeasureSpec,heightMeasureSpec);
+```
+
+2、layout过程
+
+layout的作用是ViewGroup用来确定子View的位置，当ViewGroup的位置被确定后，它会在 onLayout中遍历所有的子View并调用其layout方法，在 layout 方法中， onLayout 方法又会被调用。 layout 方法确定View本身的位置，而onLayout方法则会确定所有子元素的位置。
+
+1.View的layout方法
+
+```
+public void layout(int l, int t, int r, int b) {
+    if ((mPrivateFlags3 & PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT) != 0) {
+        onMeasure(mOldWidthMeasureSpec, mOldHeightMeasureSpec);
+        mPrivateFlags3 &= ~PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;
+    }
+
+    int oldL = mLeft;
+    int oldT = mTop;
+    int oldB = mBottom;
+    int oldR = mRight;
+
+    boolean changed = isLayoutModeOptical(mParent) ?
+            setOpticalFrame(l, t, r, b) : setFrame(l, t, r, b);
+
+    if (changed || (mPrivateFlags & PFLAG_LAYOUT_REQUIRED) == PFLAG_LAYOUT_REQUIRED) {
+        onLayout(changed, l, t, r, b);
+
+        if (shouldDrawRoundScrollbar()) {
+            if(mRoundScrollbarRenderer == null) {
+                mRoundScrollbarRenderer = new RoundScrollbarRenderer(this);
+            }
+        } else {
+            mRoundScrollbarRenderer = null;
+        }
+
+        mPrivateFlags &= ~PFLAG_LAYOUT_REQUIRED;
+
+        ListenerInfo li = mListenerInfo;
+        if (li != null && li.mOnLayoutChangeListeners != null) {
+            ArrayList<OnLayoutChangeListener> listenersCopy =
+                    (ArrayList<OnLayoutChangeListener>)li.mOnLayoutChangeListeners.clone();
+            int numListeners = listenersCopy.size();
+            for (int i = 0; i < numListeners; ++i) {
+                listenersCopy.get(i).onLayoutChange(this, l, t, r, b, oldL, oldT, oldR, oldB);
+            }
+        }
+    }
+
+    final boolean wasLayoutValid = isLayoutValid();
+
+    mPrivateFlags &= ~PFLAG_FORCE_LAYOUT;
+    mPrivateFlags3 |= PFLAG3_IS_LAID_OUT;
+    ...
+}
+```
+
+layout大致流程如下：
+
+1.  setFrame 确定View的四个顶点位置(即初始化mLeft,mRight,mTop,mBottom)，从而确定了View在父容器中的位置
+2. 调用 onLayout 方法，确定所有子View的位置，View和ViewGroup均没有真正实(和onMeasure类似，onLayout的具体实现和具体布局相关)
+
+2.通过LinearLayout的onLayout方法分析ViewGroup的onLayout方法
+
+```
+@Override
+protected void onLayout(boolean changed, int l, int t, int r, int b) {
+    if (mOrientation == VERTICAL) {
+        layoutVertical(l, t, r, b);
+    } else {
+        layoutHorizontal(l, t, r, b);
+    }
+}
+```
+
+选择竖直方向
+
+```
+void layoutVertical(int left, int top, int right, int bottom) {
+    final int paddingLeft = mPaddingLeft;
+
+    int childTop;
+    int childLeft;
+
+    // Where right end of child should go
+    final int width = right - left;
+    int childRight = width - mPaddingRight;
+
+    // Space available for child
+    int childSpace = width - paddingLeft - mPaddingRight;
+
+    final int count = getVirtualChildCount();
+
+	 ...
+    for (int i = 0; i < count; i++) {
+        final View child = getVirtualChildAt(i);
+        if (child == null) {
+            childTop += measureNullChild(i);
+        } else if (child.getVisibility() != GONE) {
+            final int childWidth = child.getMeasuredWidth();
+            final int childHeight = child.getMeasuredHeight();
+
+            final LinearLayout.LayoutParams lp =
+                    (LinearLayout.LayoutParams) child.getLayoutParams();
+            ...
+            if (hasDividerBeforeChildAt(i)) {
+                childTop += mDividerHeight;
+            }
+
+            childTop += lp.topMargin;
+            setChildFrame(child, childLeft, childTop + getLocationOffset(child),
+                    childWidth, childHeight);
+            childTop += childHeight + lp.bottomMargin + getNextLocationOffset(child);
+
+            i += getChildrenSkipCount(child, i);
+        }
+    }
+}
+```
+
+1. 遍历所有子元素并调用setChildFrame方法来为子元素指定对应位置，其中childTop会逐渐增大，这意味着后边的子元素会被放置在靠下位置，这符合LinearLayout竖直方向这一特性。
+2. setChildFrame仅仅调用子元素的layout方法
+
+这样父元素在layout方法中完成自己的定位后，就通过onLayout方法去调用子元素layout方法，子元素又会通过自己的layout方法来确定自己的位置，这样一层一层的传递下去就完成了整个View树的layout过程。
+
+```
+private void setChildFrame(View child, int left, int top, int width, int height) {
+    child.layout(left, top, left + width, top + height);
+}
+```
+
+该方法中的width和height实际上就是子元素的测量宽高。从下面代码可以得出：
+
+```
+final int childWidth = child.getMeasuredWidth();
+final int childHeight = child.getMeasuredHeight();
+setChildFrame(child, childLeft, childTop + getLocationOffset(child), childWidth, childHeight);
+```
+
+在子元素layout方法中会通过setFrame去设置子元素四个顶点的位置。这样子元素的位置就确定了
+
+```
+mLeft = left;
+mTop = top;
+mRight = right;
+mBottom = bottom;
+```
+
+3、draw过程
+
+View的绘制过程遵循如下几步：
+
+1. 绘制背景 drawBackground(canvas)
+2. 绘制自己(onDraw)
+3. 绘制children(dispatchDraw 遍历所有子View的draw方法)
+4. 绘制装饰(onDrawScrollBars)
+
+```
+public void draw(Canvas canvas) {
+    final int privateFlags = mPrivateFlags;
+    final boolean dirtyOpaque = (privateFlags & PFLAG_DIRTY_MASK) == PFLAG_DIRTY_OPAQUE &&
+            (mAttachInfo == null || !mAttachInfo.mIgnoreDirtyState);
+    mPrivateFlags = (privateFlags & ~PFLAG_DIRTY_MASK) | PFLAG_DRAWN;
+
+    /*
+     * Draw traversal performs several drawing steps which must be executed
+     * in the appropriate order:
+     *
+     *      1. Draw the background
+     *      2. If necessary, save the canvas' layers to prepare for fading
+     *      3. Draw view's content
+     *      4. Draw children
+     *      5. If necessary, draw the fading edges and restore layers
+     *      6. Draw decorations (scrollbars for instance)
+     */
+
+    // Step 1, draw the background, if needed
+    int saveCount;
+
+    if (!dirtyOpaque) {
+        drawBackground(canvas);
+    }
+
+    // skip step 2 & 5 if possible (common case)
+    final int viewFlags = mViewFlags;
+    boolean horizontalEdges = (viewFlags & FADING_EDGE_HORIZONTAL) != 0;
+    boolean verticalEdges = (viewFlags & FADING_EDGE_VERTICAL) != 0;
+    if (!verticalEdges && !horizontalEdges) {
+        // Step 3, draw the content
+        if (!dirtyOpaque) onDraw(canvas);
+
+        // Step 4, draw the children
+        dispatchDraw(canvas);
+
+        drawAutofilledHighlight(canvas);
+
+        // Overlay is part of the content and draws beneath Foreground
+        if (mOverlay != null && !mOverlay.isEmpty()) {
+            mOverlay.getOverlayView().dispatchDraw(canvas);
+        }
+
+        // Step 6, draw decorations (foreground, scrollbars)
+        onDrawForeground(canvas);
+
+        // Step 7, draw the default focus highlight
+        drawDefaultFocusHighlight(canvas);
+
+        if (debugDraw()) {
+            debugDrawFocus(canvas);
+        }
+
+        // we're done...
+        return;
+    }
+
+    ...
+}
+```
+
+View的绘制过程是通过dispatchDraw来实现的，dispatchDraw会遍历调用所有子元素的draw方法，这样draw事件就一层一层的传递下去了。
+
+注：ViewGroup会默认启用 setWillNotDraw 为ture，导致系统不会去执行 onDraw ，所以自定义ViewGroup需要通过onDraw来绘制内容时，必须显式的关闭 WILL_NOT_DRAW 这个标记位，即调用setWillNotDraw(false)
+
+
+四、自定义View
+
+1、自定义View的分类
+
+1. 继承View：通过 onDraw 方法来实现一些效果，需要自己支持 wrap_content ，并且 padding也要去进行处理。
+2. 继承ViewGroup：实现自定义的布局方式，需要合适地处理ViewGroup的测量、布局这两个过程，并同时处理子View的测量和布局过程。
+3. 继承特定的View子类（如TextView、Button）： 扩展某种已有的控件的功能，且不需要自己去管理wrap_content 和padding
+4. 继承特定的ViewGroup子类（如LinearLayout）
+
+2、自定义View须知
+
+1. 直接继承View或ViewGroup的控件， 需要在onmeasure中对wrap_content做特殊处理。 指定wrap_content模式下的默认宽/高。
+2. 直接继承View的控件，如果不在draw方法中处理padding，那么padding属性就无法起作用。直接继承ViewGroup的控件也需要在onMeasure和onLayout中考虑padding和子元素 margin的影响，不然padding和子元素的margin无效。
+3. 尽量不要在View中使用Handler，因为没必要。View内部提供了post系列的方法，完全可以替代Handler的作用。
+4. View中有线程和动画，需要在View的onDetachedFromWindow中停止。
+5. View带有滑动嵌套情形时，需要处理好滑动冲突
+
+3、如何对自定义View进行控制
 
 1. 如果想控制View在屏幕上的渲染效果，就在重写onDraw()方法，在里面进行相应的处理。
 2. 如果想要控制用户同View之间的交互操作，则在onTouchEvent()方法中对手势进行控制处理。
@@ -4261,19 +4988,7 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 4. 在 XML文件中设置自定义View的XML属性。
 5. 如果想避免失去View的相关状态参数的话，就在onSaveInstanceState() 和 onRestoreInstanceState()方法中保存有关View的状态信息。
 
-所以总结绘制步骤就是：
-
-绘制流程的六个步骤：
-
-1. 对View的背景绘制
-2. 保存当前的图层信息(跳过)
-3. 绘制View的内容
-4. 对View的子View进行绘制一般情况是ViewGroup
-5. 绘制View的褪色的边缘，类似于阴影效果(跳过)
-6. 绘制View的装饰（例如：滚动条）
-
-
-四、invalidate() 、postInvalidate()、requestLayout() 
+4、invalidate() 、postInvalidate()、requestLayout() 
 
 1、invalidate() 
 
@@ -10220,21 +10935,872 @@ onMeasure -> onLayout -> onDraw
 
 ![image](pic/p399.png)
 
+## 保活
+
+一、7.0一下保活
+
+进程保活的关键点有两个，一个是进程优先级的理解，优先级越高存活几率越大。二是弄清楚哪些场景会导致进程会kill，然后采取下面的策略对各种场景进行优化：
+
+1. 提高进程的优先级
+2. 在进程被kill之后能够唤醒
+
+1、进程优先级
+
+Android一般的进程优先级划分：
+
+1. 前台进程 (Foreground process)
+2. 可见进程 (Visible process)
+3. 服务进程 (Service process)
+4. 后台进程 (Background process)
+5. 空进程 (Empty process)
+
+这是一种粗略的划分，进程其实有一种具体的数值，称作oom_adj，注意：数值越大优先级越低：
+
+![image](pic/p404.png)
+
+* 红色部分是容易被回收的进程，属于android进程
+* 绿色部分是较难被回收的进程，属于android进程
+* 其他部分则不是android进程，也不会被系统回收，一般是ROM自带的app和服务才能拥有
+
+2、进程被kill的场景
+
+1.点击home键使app长时间停留在后台，内存不足被kill
+
+处理这种情况前提是你的app至少运行了一个service，然后通过Service.startForeground() 设置为前台服务，可以将oom_adj的数值由4降低到1，大大提高存活率。
+
+* 要注意的是android4.3之后Service.startForeground() 会强制弹出通知栏，解决办法是再启动一个service和推送共用一个通知栏，然后stop这个service使得通知栏消失。
+* Android 7.1之后google修复这个bug，目前没有解决办法
+
+下面的代码放到你的service的onStartCommand方法中：
+
+```
+//设置service为前台服务，提高优先级
+if (Build.VERSION.SDK_INT < 18) {
+    //Android4.3以下 ，此方法能有效隐藏Notification上的图标
+    service.startForeground(GRAY_SERVICE_ID, new Notification());
+} else if(Build.VERSION.SDK_INT>18 && Build.VERSION.SDK_INT<25){
+    //Android4.3 - Android7.0，此方法能有效隐藏Notification上的图标
+    Intent innerIntent = new Intent(service, GrayInnerService.class);
+    service.startService(innerIntent);
+    service.startForeground(GRAY_SERVICE_ID, new Notification());
+}else{
+    //Android7.1 google修复了此漏洞，暂无解决方法（现状：Android7.1以上app启动后通知栏会出现一条"正在运行"的通知消息）
+    service.startForeground(GRAY_SERVICE_ID, new Notification());
+}
+```
+
+2.在大多数国产手机下，进入锁屏状态一段时间，省电机制会kill后台进程
+
+这种情况和上面不太一样，是很过国产手机rom自带的优化，当锁屏一段时间之后，即使手机内存够用为了省电，也会释放掉一部分内存。
+
+策略：注册广播监听锁屏和解锁事件， 锁屏后启动一个1像素的透明Activity，这样直接把进程的oom_adj数值降低到0，0是android进程的最高优先级。 解锁后销毁这个透明Activity。这里我把这个Activity放到:remote进程也就是我那个后台服务进程，当然你也可以放到主进程，看你打算保活哪个进程。
+
+![image](pic/p405.png)
+
+我们可以写一个KeepLiveManager来负责接收广播，维护这个Activity的创建和销毁，注意锁屏广播和解锁分别是：ACTION_SCREEN_OOF和ACTION_USER_PRESENT，并且只能通过动态注册来绑定，并且是绑定到你的后台service里面,onCreate绑定,onDestroy里面解绑
+
+3.用户手动释放内存：包括手机自带清理工具，和第三方app（360，猎豹清理大师等）
+
+理内存软件会把优先级低于 前台进程(oom_adj = 0)的所有进程放入清理列表，而当我们打开了清理软件就意味着其他app不可能处于前台。所以说理论上可以kill任何app。
+
+因此这类场景唯一的处理办法就是加入手机rom 白名单，比如你打开小米，魅族的权限管理 -> 自启动管理可以看到 QQ，微信，天猫默认被勾选，这就是厂商合作。那我们普通app可以这么做：在app的设置界面加一个选项，提示用户自己去勾选自启动。
+
+3、进程唤醒
+
+分两种情况，一是主进程（含有Activity没有service），这种进程由于内存不足被kill之后，用户再次打开app系统会恢复到上次的Activity。另一种是service的后台进程被kill，可以通过service自有api来重启service：
+
+```
+@Override
+public int onStartCommand(Intent intent, int flags, int startId) {
+    // service被异常停止后，系统尝试重启service，不能保证100%重启成功
+    return START_STICKY;    
+}
+```
+
+但它不是100%保证重启成功，比如下面2种情况：
+
+Service 第一次被异常杀死后会在5秒内重启，第二次被杀死会在10秒内重启，第三次会在20秒内重启，一旦在短时间内 Service 被杀死达到5次，则系统不再拉起。
+
+进程被取得 Root 权限的管理工具或系统工具通过 forestop 停止掉，无法重启。
+
+4、结论
+
+1.和Android版本关系很大
+
+对于Android6.0以及以下的大部分机型还是有效果的，但是Android7.0和Android8.0基本上所有机型全部阵亡，大部分后台进程在锁屏后无法存活超过20分钟。
+这个可以从Android 6.0，7.0和8.0的新特性看出一些端倪，google对于内存/电量使用越来越严格。
+
+![image](pic/p406.png)
+
+2.和手机厂商关系比较大，测试结果显示，oppo/vivo这两家厂商进程保活最困难，小米和三星比较宽松。其他的机型居中
+
+二、2018年Android的保活方案效果统计
+
+1、常见保活方案
+
+1. 监听广播：监听全局的静态广播，比如时间更新的广播、开机广播、解锁屏、网络状态、解锁加锁亮屏暗屏（3.1版本），高版本需要应用开机后运行一次才能监听这些系统广播，目前此方案失效。可以更换思路，做APP启动后的保活（监听广播启动保活的前台服务）
+2. 定时器、JobScheduler：假如应用被系统杀死，那么定时器则失效，此方案失效。JobService在5.0,5.1,6.0作用很大，7.0时候有一定影响（可以在电源管理中给APP授权）
+3. 双进程（NDK方式Fork子进程）、双Service守护：高版本已失效，5.0起系统回收策略改成进程组。双Service方案也改成了应用被杀，任何后台Service无法正常状态运行
+4. 提高Service优先级：只能一定程度上缓解Service被立马回收
+
+2、保活
+
+1. AIDL方式单进程、双进程方式保活Service
+2. 降低oom_adj的值：常驻通知栏（可通过启动另外一个服务关闭Notification，不对oom_adj值有影响）、使用”1像素“的Activity覆盖在getWindow()的view上、循环播放无声音频（黑科技，7.0下杀不掉）
+3. 监听锁屏广播：使Activity始终保持前台
+4. 使用自定义锁屏界面：覆盖了系统锁屏界面。
+5. 通过android:process属性来为Service创建一个进程
+6. 跳转到系统白名单界面让用户自己添加app进入白名单
+
+3、复活
+
+1. JobScheduler：原理类似定时器，5.0,5.1,6.0作用很大，7.0时候有一定影响（可以在电源管理中给APP授权）
+2. 推送互相唤醒复活：极光、友盟、以及各大厂商的推送
+3. 同派系APP广播互相唤醒：比如今日头条系、阿里系
+
+4、方案实现效果统计
+
+1.双进程守护方案（基于onStartCommand() return START_STICKY）
+
+结论：除了华为此方案无效以及未更改底层的厂商不起作用外（START_STICKY字段就可以保持Service不被杀）。此方案可以与其他方案混合使用
+
+2.监听锁屏广播打开1像素Activity（基于onStartCommand() return START_STICKY）
+
+结论：此方案无效果
+
+3.故意在后台播放无声的音乐（基于onStartCommand() return START_STICKY）
+
+结论：成功对华为手机保活。小米8下也成功突破20分钟
+
+4.使用JobScheduler唤醒Service（基于onStartCommand() return START_STICKY）
+
+结论：只对5.0，5.1、6.0起作用
+
+5.混合使用的效果，并且在通知栏弹出通知
+
+结论：高版本情况下可以使用弹出通知栏、双进程、无声音乐提高后台服务的保活概率
 
 
+## https原理
 
- 
+一、什么是HTTP协议？
 
+HTTP协议全称Hyper Text Transfer Protocol，翻译过来就是超文本传输协议，位于TCP/IP四层模型当中的应用层。
 
+![image](pic/p407.png)
 
+HTTP协议通过请求/响应的方式，在客户端和服务端之间进行通信。
 
+![image](pic/p408.png)
 
+这一切看起来很美好，但是HTTP协议有一个致命的缺点：不够安全。
 
+HTTP协议的信息传输完全以明文方式，不做任何加密，相当于是在网络上“裸奔”。这样会导致什么问题呢？让我们打一个比方：
 
+小灰是客户端，小灰的同事小红是服务端，有一天小灰试图给小红发送请求。
 
+![image](pic/p409.png)
 
+但是，由于传输信息是明文，这个信息有可能被某个中间人恶意截获甚至篡改。这种行为叫做中间人攻击。
 
+![image](pic/p410.png)
 
+如何进行加密呢？
+
+小灰和小红可以事先约定一种对称加密方式，并且约定一个随机生成的密钥。后续的通信中，信息发送方都使用密钥对信息加密，而信息接收方通过同样的密钥对信息解密。
+
+![image](pic/p411.png)
+
+这样做是不是就绝对安全了呢？并不是。
+
+虽然我们在后续的通信中对明文进行了加密，但是第一次约定加密方式和密钥的通信仍然是明文，如果第一次通信就已经被拦截了，那么密钥就会泄露给中间人，中间人仍然可以解密后续所有的通信内容。
+
+这可怎么办呢？别担心，我们可以使用非对称加密，为密钥的传输做一层额外的保护。
+
+非对称加密的一组秘钥对中，包含一个公钥和一个私钥。明文既可以用公钥加密，用私钥解密；也可以用私钥加密，用公钥解密。
+
+在小灰和小红建立通信的时候，小红首先把自己的公钥Key1发给小灰：
+
+![image](pic/p412.png)
+
+收到小红的公钥以后，小灰自己生成一个用于对称加密的密钥Key2，并且用刚才接收的公钥Key1对Key2进行加密（这里有点绕），发送给小红：
+
+![image](pic/p413.png)
+
+小红利用自己非对称加密的私钥，解开了公钥Key1的加密，获得了Key2的内容。从此以后，两人就可以利用Key2进行对称加密的通信了。
+
+![image](pic/p414.png)
+
+在通信过程中，即使中间人在一开始就截获了公钥Key1，由于不知道私钥是什么，也无从解密。
+
+存在问题:中间人虽然不知道小红的私钥是什么，但是在截获了小红的公钥Key1之后，却可以偷天换日，自己另外生成一对公钥私钥，把自己的公钥Key3发送给小灰。
+
+小灰不知道公钥被偷偷换过，以为Key3就是小红的公钥。于是按照先前的流程，用Key3加密了自己生成的对称加密密钥Key2，发送给小红。
+
+这一次通信再次被中间人截获，中间人先用自己的私钥解开了Key3的加密，获得Key2，然后再用当初小红发来的Key1重新加密，再发给小红。
+
+![image](pic/p415.png)
+
+这样一来，两个人后续的通信尽管用Key2做了对称加密，但是中间人已经掌握了Key2，所以可以轻松进行解密。
+
+这时候，我们有必要引入第三方，一个权威的证书颁发机构（CA）来解决。
+
+到底什么是证书呢？证书包含如下信息：
+
+![image](pic/p416.png)
+
+流程如下：
+
+1. 作为服务端的小红，首先把自己的公钥发给证书颁发机构，向证书颁发机构申请证书。
+2. 证书颁发机构自己也有一对公钥私钥。机构利用自己的私钥来加密Key1，并且通过服务端网址等信息生成一个证书签名，证书签名同样经过机构的私钥加密。证书制作完成后，机构把证书发送给了服务端小红。
+3. 当小灰向小红请求通信的时候，小红不再直接返回自己的公钥，而是把自己申请的证书返回给小灰。
+4. 小灰收到证书以后，要做的第一件事情是验证证书的真伪。需要说明的是，各大浏览器和操作系统已经维护了所有权威证书机构的名称和公钥。所以小灰只需要知道是哪个机构颁布的证书，就可以从本地找到对应的机构公钥，解密出证书签名。
+
+接下来，小灰按照同样的签名规则，自己也生成一个证书签名，如果两个签名一致，说明证书是有效的。
+
+验证成功后，小灰就可以放心地再次利用机构公钥，解密出服务端小红的公钥Key1。
+
+5. 像之前一样，小灰生成自己的对称加密密钥Key2，并且用服务端公钥Key1加密Key2，发送给小红。
+6. 最后，小红用自己的私钥解开加密，得到对称加密密钥Key2。于是两人开始用Key2进行对称加密的通信。
+
+二、HTTPS实现原理
+
+在学习HTTPS原理之前我们先了解一下两种加密方式： 对称加密和非对称加密。 对称加密即加密和解密使用同一个密钥，虽然对称加密破解难度很大，但由于对称加密需要在网络上传输密钥和密文，一旦被黑客截取很容就能被破解，因此对称加密并不是一个较好的选择。 
+
+非对称加密即加密和解密使用不同的密钥，分别称为公钥和私钥。我们可以用公钥对数据进行加密，但必须要用私钥才能解密。在网络上只需要传送公钥，私钥保存在服务端用于解密公钥加密后的密文。但是非对称加密消耗的CPU资源非常大，效率很低，严重影响HTTPS的性能和速度。因此非对称加密也不是HTTPS的理想选择。
+
+那么HTTPS采用了怎样的加密方式呢？其实为了提高安全性和效率HTTPS结合了对称和非对称两种加密方式。即客户端使用对称加密生成密钥（key）对传输数据进行加密，然后使用非对称加密的公钥再对key进行加密。因此网络上传输的数据是被key加密的密文和用公钥加密后的密文key，因此即使被黑客截取，由于没有私钥，无法获取到明文key，便无法获取到明文数据。所以HTTPS的加密方式是安全的。
+
+接下来我们以TLS1.2为例来认识HTTPS的握手过程。
+
+* 客户端发送 client_hello，包含一个随机数 random1。 
+* 服务端回复 server_hello，包含一个随机数 random2，携带了证书公钥 P。 
+* 客户端接收到 random2 之后就能够生成 premaster_secrect （对称加密的密钥）以及 master_secrect（用premaster_secret加密后的数据）。 
+* 客户端使用证书公钥 P 将 premaster_secrect 加密后发送给服务器 (用公钥P对premaster_secret加密)。 
+* 服务端使用私钥解密得到 premaster_secrect。又由于服务端之前就收到了随机数 1，所以服务端根据相同的生成算法，在相同的输入参数下，求出了相同的 master secrect。
+
+![image](pic/p417.png)
+
+三、数字证书
+
+我们上面提到了HTTPS的工作原理，通过对称加密和非对称加密实现数据的安全传输。我们也知道非对称加密过程需要用到公钥进行加密。那么公钥从何而来？其实公钥就被包含在数字证书中。数字证书通常来说是由受信任的数字证书颁发机构CA，在验证服务器身份后颁发，证书中包含了一个密钥对（公钥和私钥）和所有者识别信息。数字证书被放到服务端，具有服务器身份验证和数据传输加密功能。
+
+除了CA机构颁发的证书之外，还有非CA机构颁发的证书和自签名证书。
+
+非CA机构即是不受信任的机构颁发的证书，理所当然这样的证书是不受信任的。
+自签名证书，就是自己给自己颁发的证书。当然自签名证书也是不受信任的。
+例如大(chou)名(ming)鼎(zhao)鼎(zhu)的12306网站使用的就是非CA机构颁发的证书（最近发现12306购票页面已经改为CA证书了），12306的证书是由SRCA颁发，SRCA中文名叫中铁数字证书认证中心，简称中铁CA。这是个铁道部自己搞的机构，相当于是自己给自己颁发证书。
+
+说了这么多，我们来总结一下数字证书的两个作用：
+
+> 分发公钥。每个数字证书都包含了注册者生成的公钥。在 TLS握手时会通过 certificate 消息传输给客户端。
+> 身份授权。确保客户端访问的网站是经过 CA 验证的可信任的网站。（在自签名证书的情况下可以验证是否是我们自己的服务器）
+
+## APP 性能优化
+
+一、卡顿优化
+
+Android 应用启动慢，使用时经常卡顿，是非常影响用户体验的，应该尽量避免出现。卡顿的场景有很多，按场景可以分为4类：UI 绘制、应用启动、页面跳转、事件响应，如图：
+
+![image](pic/p418.png)
+
+这4种卡顿场景的根本原因可以分为两大类：
+
+* 界面绘制。主要原因是绘制的层级深、页面复杂、刷新不合理，由于这些原因导致卡顿的场景更多出现在 UI 和启动后的初始界面以及跳转到页面的绘制上。
+* 数据处理。导致这种卡顿场景的原因是数据处理量太大，一般分为三种情况，一是数据在处理 UI 线程，二是数据处理占用 CPU 高，导致主线程拿不到时间片，三是内存增加导致 GC 频繁，从而引起卡顿。
+
+1、影响绘制的根本原因有以下两个方面：
+
+* 绘制任务太重，绘制一帧内容耗时太长。
+* 主线程太忙，根据系统传递过来的 VSYNC 信号来时还没准备好数据导致丢帧。
+
+绘制耗时太长，有一些工具可以帮助我们定位问题。主线程太忙则需要注意了，主线程关键职责是处理用户交互，在屏幕上绘制像素，并进行加载显示相关的数据，所以特别需要避免任何主线程的事情，这样应用程序才能保持对用户操作的即时响应。总结起来，主线程主要做以下几个方面工作：
+
+* UI 生命周期控制
+* 系统事件处理
+* 消息处理
+* 界面布局
+* 界面绘制
+* 界面刷新
+
+除此之外，应该尽量避免将其他处理放在主线程中，特别复杂的数据计算和网络请求等。
+
+2、性能分析工具
+
+性能问题并不容易复现，也不好定位，但是真的碰到问题还是需要去解决的，那么分析问题和确认问题是否解决，就需要借助相应的的调试工具，比如查看 Layout 层次的 Hierarchy View、Android 系统上带的 GPU Profile 工具和静态代码检查工具 Lint 等，这些工具对性能优化起到非常重要的作用，所以要熟悉，知道在什么场景用什么工具来分析。
+
+1. Profile GPU Rendering
+
+在手机开发者模式下，有一个卡顿检测工具叫做：Profile GPU Rendering
+
+它的功能特点如下：
+
+* 一个图形监测工具，能实时反应当前绘制的耗时
+* 横轴表示时间，纵轴表示每一帧的耗时
+* 随着时间推移，从左到右的刷新呈现
+* 提供一个标准的耗时，如果高于标准耗时，就表示当前这一帧丢失
+
+2. TraceView
+
+TraceView 是 Android SDK 自带的工具，用来分析函数调用过程，可以对 Android 的应用程序以及 Framework 层的代码进行性能分析。它是一个图形化的工具，最终会产生一个图表，用于对性能分析进行说明，可以分析到每一个方法的执行时间，其中可以统计出该方法调用次数和递归次数，实际时长等参数维度，使用非常直观，分析性能非常方便。
+
+3. Systrace UI 性能分析
+
+Systrace 是 Android 4.1及以上版本提供的性能数据采样和分析工具，它是通过系统的角度来返回一些信息。它可以帮助开发者收集 Android 关键子系统，如 surfaceflinger、WindowManagerService 等 Framework 部分关键模块、服务、View系统等运行信息，从而帮助开发者更直观地分析系统瓶颈，改进性能。
+
+Systrace 的功能包括跟踪系统的 I/O 操作、内核工作队列、CPU 负载等，在 UI 显示性能分析上提供很好的数据，特别是在动画播放不流畅、渲染卡等问题上。
+
+3、优化建议
+
+1. 布局优化
+
+布局是否合理主要影响的是页面测量时间的多少，我们知道一个页面的显示测量和绘制过程都是通过递归来完成的，多叉树遍历的时间与树的高度h有关，其时间复杂度 O(h)，如果层级太深，每增加一层则会增加更多的页面显示时间，所以布局的合理性就显得很重要。
+
+那布局优化有哪些方法呢，主要通过减少层级、减少测量和绘制时间、提高复用性三个方面入手。
+
+总结如下：
+
+* 减少层级。合理使用 RelativeLayout 和 LinerLayout，合理使用Merge。
+* 提高显示速度。使用 ViewStub，它是一个看不见的、不占布局位置、占用资源非常小的视图对象。
+* 布局复用。可以通过<include> 标签来提高复用。
+* 尽可能少用wrap_content。wrap_content 会增加布局 measure 时计算成本，在已知宽高为固定值时，不用wrap_content 。
+* 删除控件中无用的属性。
+
+2. 避免过度绘制
+
+过度绘制是指在屏幕上的某个像素在同一帧的时间内被绘制了多次。在多层次重叠的 UI 结构中，如果不可见的 UI 也在做绘制的操作，就会导致某些像素区域被绘制了多次，从而浪费了多余的 CPU 以及 GPU 资源。
+
+如何避免过度绘制呢，如下：
+
+* 布局上的优化。移除 XML 中非必须的背景，移除 Window 默认的背景、按需显示占位背景图片
+* 自定义View优化。使用 canvas.clipRect()来帮助系统识别那些可见的区域，只有在这个区域内才会被绘制。
+
+3. 启动优化
+
+通过对启动速度的监控，发现影响启动速度的问题所在，优化启动逻辑，提高应用的启动速度。启动主要完成三件事：UI 布局、绘制和数据准备。因此启动速度优化就是需要优化这三个过程：
+
+* UI 布局。应用一般都有闪屏页，优化闪屏页的 UI 布局，可以通过 Profile GPU Rendering 检测丢帧情况。
+* 启动加载逻辑优化。可以采用分布加载、异步加载、延期加载策略来提高应用启动速度。
+* 数据准备。数据初始化分析，加载数据可以考虑用线程初始化等策略。
+
+4. 合理的刷新机制
+
+在应用开发过程中，因为数据的变化，需要刷新页面来展示新的数据，但频繁刷新会增加资源开销，并且可能导致卡顿发生，因此，需要一个合理的刷新机制来提高整体的 UI 流畅度。合理的刷新需要注意以下几点：
+
+* 尽量减少刷新次数。
+* 尽量避免后台有高的 CPU 线程运行。
+* 缩小刷新区域。
+
+5. 其他
+
+在实现动画效果时，需要根据不同场景选择合适的动画框架来实现。有些情况下，可以用硬件加速方式来提供流畅度。
+
+二、内存优化
+
+1、内存分析工具
+
+1. Memory Monitor
+
+Memory Monitor 是一款使用非常简单的图形化工具，可以很好地监控系统或应用的内存使用情况，主要有以下功能：
+
+* 显示可用和已用内存，并且以时间为维度实时反应内存分配和回收情况。
+* 快速判断应用程序的运行缓慢是否由于过度的内存回收导致。
+* 快速判断应用是否由于内存不足导致程序崩溃。
+
+2. Heap Viewer
+
+Heap Viewer 的主要功能是查看不同数据类型在内存中的使用情况，可以看到当前进程中的 Heap Size 的情况，分别有哪些类型的数据，以及各种类型数据占比情况。通过分析这些数据来找到大的内存对象，再进一步分析这些大对象，进而通过优化减少内存开销，也可以通过数据的变化发现内存泄漏。
+
+3. Allocation Tracker
+
+Memory Monitor 和 Heap Viewer 都可以很直观且实时地监控内存使用情况，还能发现内存问题，但发现内存问题后不能再进一步找到原因，或者发现一块异常内存，但不能区别是否正常，同时在发现问题后，也不能定位到具体的类和方法。
+这时就需要使用另一个内存分析工具 Allocation Tracker，进行更详细的分析， Allocation Tracker 可以分配跟踪记录应用程序的内存分配，并列出了它们的调用堆栈，可以查看所有对象内存分配的周期。
+
+4. Memory Analyzer Tool(MAT)
+
+MAT 是一个快速，功能丰富的 Java Heap 分析工具，通过分析 Java 进程的内存快照 HPROF 分析，从众多的对象中分析，快速计算出在内存中对象占用的大小，查看哪些对象不能被垃圾收集器回收，并可以通过视图直观地查看可能造成这种结果的对象。
+
+2、常见内存泄漏场景
+
+如果在内存泄漏发生后再去找原因并修复会增加开发的成本，最好在编写代码时就能够很好地考虑内存问题，写出更高质量的代码，这里列出一些常见的内存泄漏场景，在以后的开发过程中需要避免这类问题。
+
+* 资源性对象未关闭。比如Cursor、File文件等，往往都用了一些缓冲，在不使用时，应该及时关闭它们。
+* 注册对象未注销。比如事件注册后未注销，会导致观察者列表中维持着对象的引用。
+* 类的静态变量持有大数据对象。
+* 非静态内部类的静态实例。
+* Handler临时性内存泄漏。如果Handler是非静态的，容易导致 Activity 或 Service 不会被回收。
+* 容器中的对象没清理造成的内存泄漏。
+* WebView。WebView 存在着内存泄漏的问题，在应用中只要使用一次 WebView，内存就不会被释放掉。
+
+除此之外，内存泄漏可监控，常见的就是用LeakCanary 第三方库，这是一个检测内存泄漏的开源库，使用非常简单，可以在发生内存泄漏时告警，并且生成 leak tarce 分析泄漏位置，同时可以提供 Dump 文件进行分析。
+
+3、优化内存空间
+
+没有内存泄漏，并不意味着内存就不需要优化，在移动设备上，由于物理设备的存储空间有限，Android 系统对每个应用进程也都分配了有限的堆内存，因此使用最小内存对象或者资源可以减小内存开销，同时让GC 能更高效地回收不再需要使用的对象，让应用堆内存保持充足的可用内存，使应用更稳定高效地运行。常见做法如下：
+
+* 对象引用。强引用、软引用、弱引用、虚引用四种引用类型，根据业务需求合理使用不同，选择不同的引用类型。
+*减少不必要的内存开销。注意自动装箱，增加内存复用，比如有效利用系统自带的资源、视图复用、对象池、Bitmap对象的复用。
+* 使用最优的数据类型。比如针对数据类容器结构，可以使用ArrayMap数据结构，避免使用枚举类型，使用缓存Lrucache等等。
+* 图片内存优化。可以设置位图规格，根据采样因子做压缩，用一些图片缓存方式对图片进行管理等等。
+
+三、稳定性优化
+
+Android 应用的稳定性定义很宽泛，影响稳定性的原因很多，比如内存使用不合理、代码异常场景考虑不周全、代码逻辑不合理等，都会对应用的稳定性造成影响。其中最常见的两个场景是：Crash 和 ANR，这两个错误将会使得程序无法使用，比较常用的解决方式如下：
+
+* 提高代码质量。比如开发期间的代码审核，看些代码设计逻辑，业务合理性等。
+* 代码静态扫描工具。常见工具有Android Lint、Findbugs、Checkstyle、PMD等等。
+* Crash监控。把一些崩溃的信息，异常信息及时地记录下来，以便后续分析解决。
+* Crash上传机制。在Crash后，尽量先保存日志到本地，然后等下一次网络正常时再上传日志信息。
+
+四、耗电优化
+
+在移动设备中，电池的重要性不言而喻，没有电什么都干不成。对于操作系统和设备开发商来说，耗电优化一直没有停止，去追求更长的待机时间，而对于一款应用来说，并不是可以忽略电量使用问题，特别是那些被归为“电池杀手”的应用，最终的结果是被卸载。因此，应用开发者在实现需求的同时，需要尽量减少电量的消耗。
+
+在 Android5.0 以前，在应用中测试电量消耗比较麻烦，也不准确，5.0 之后专门引入了一个获取设备上电量消耗信息的 API:Battery Historian。Battery Historian 是一款由 Google 提供的 Android 系统电量分析工具，和Systrace 一样，是一款图形化数据分析工具，直观地展示出手机的电量消耗过程，通过输入电量分析文件，显示消耗情况，最后提供一些可供参考电量优化的方法。
+
+除此之外，还有一些常用方案可提供：
+
+* 计算优化，避开浮点运算等。
+* 避免 WaleLock 使用不当。
+* 使用 Job Scheduler。
+
+五、安装包大小优化
+
+减少安装包大小的常用方案
+
+* 代码混淆。使用proGuard 代码混淆器工具，它包括压缩、优化、混淆等功能。
+* 资源优化。比如使用 Android Lint 删除冗余资源，资源文件最少化等。
+* 图片优化。比如利用 AAPT 工具对 PNG 格式的图片做压缩处理，降低图片色彩位数等。
+* 避免重复功能的库，使用 WebP图片格式等。
+* 插件化。比如功能模块放在服务器上，按需下载，可以减少安装包大小。
+
+## EventBus
+
+一、概述
+
+1、EventBus的三要素
+
+* Event：事件，可以是任意类型的对象。
+* Subscriber：事件订阅者，在EventBus3.0之前消息处理的方法只能限定于onEvent、onEventMainThread、onEventBackgroundThread和onEventAsync，他们分别代表四种线程模型。而在EventBus3.0之后，事件处理的方法可以随便取名，但是需要添加一个注解@Subscribe，并且要指定线程模型（默认为POSTING）。
+* Publisher：事件发布者，可以在任意线程任意位置发送事件，直接调用EventBus的post(Object)方法。可以自己实例化EventBus对象，但一般使用EventBus.getDefault()就好了，根据post函数参数的类型，会自动调用订阅相应类型事件的函数。
+
+2、EventBus的四种ThreadMode（线程模型）
+
+EventBus3.0有以下四种ThreadMode：
+
+* POSTING（默认）：如果使用事件处理函数指定了线程模型为POSTING，那么该事件在哪个线程发布出来的，事件处理函数就会在这个线程中运行，也就是说发布事件和接收事件在同一个线程。在线程模型为POSTING的事件处理函数中尽量避免执行耗时操作，因为它会阻塞事件的传递，甚至有可能会引起ANR。
+* MAIN:事件的处理会在UI线程中执行。事件处理时间不能太长，长了会ANR的。
+* BACKGROUND：如果事件是在UI线程中发布出来的，那么该事件处理函数就会在新的线程中运行，如果事件本来就是子线程中发布出来的，那么该事件处理函数直接在发布事件的线程中执行。在此事件处理函数中禁止进行UI更新操作。
+* ASYNC：无论事件在哪个线程发布，该事件处理函数都会在新建的子线程中执行，同样，此事件处理函数中禁止进行UI更新操作。
+
+二、源码解析
+
+1、构造函数
+
+```
+public static EventBus getDefault() {
+    if (defaultInstance == null) {
+        synchronized (EventBus.class) {
+            if (defaultInstance == null) {
+                defaultInstance = new EventBus();
+            }
+        }
+    }
+    return defaultInstance;
+}
+```
+
+使用DCL双重检索单例模式创建
+
+```
+public EventBus() {
+    this(DEFAULT_BUILDER);
+}
+```
+
+DEFAULT_BUILDER是默认的EventBusBuilder，用来构造EventBus：
+
+```
+private static final EventBusBuilder DEFAULT_BUILDER = new EventBusBuilder();
+```
+
+this调用了EventBus另一个构造函数：
+
+```
+EventBus(EventBusBuilder builder) {
+    logger = builder.getLogger();
+    subscriptionsByEventType = new HashMap<>();
+    typesBySubscriber = new HashMap<>();
+    stickyEvents = new ConcurrentHashMap<>();
+    mainThreadSupport = builder.getMainThreadSupport();
+    mainThreadPoster = mainThreadSupport != null ? mainThreadSupport.createPoster(this) : null;
+    backgroundPoster = new BackgroundPoster(this);
+    asyncPoster = new AsyncPoster(this);
+    indexCount = builder.subscriberInfoIndexes != null ? builder.subscriberInfoIndexes.size() : 0;
+    subscriberMethodFinder = new SubscriberMethodFinder(builder.subscriberInfoIndexes,
+            builder.strictMethodVerification, builder.ignoreGeneratedIndex);
+    logSubscriberExceptions = builder.logSubscriberExceptions;
+    logNoSubscriberMessages = builder.logNoSubscriberMessages;
+    sendSubscriberExceptionEvent = builder.sendSubscriberExceptionEvent;
+    sendNoSubscriberEvent = builder.sendNoSubscriberEvent;
+    throwSubscriberException = builder.throwSubscriberException;
+    eventInheritance = builder.eventInheritance;
+    executorService = builder.executorService;
+}
+```
+
+2、订阅者注册
+
+```
+public void register(Object subscriber) {
+    Class<?> subscriberClass = subscriber.getClass();
+    // 用 subscriberMethodFinder 提供的方法，找到在 subscriber 这个类里面订阅的内容。
+    List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
+    synchronized (this) {
+        for (SubscriberMethod subscriberMethod : subscriberMethods) {
+            subscribe(subscriber, subscriberMethod);
+        }
+    }
+}
+```
+
+1.查找订阅方法
+
+findSubscriberMethods找出一个SubscriberMethod的集合，也就是传进来的订阅者所有的订阅的方法，接下来遍历订阅者的订阅方法来完成订阅者的订阅操作。对于SubscriberMethod（订阅方法）类中，主要就是用保存订阅方法的Method对象、线程模式、事件类型、优先级、是否是粘性事件等属性。下面就来看一下findSubscriberMethods方法：
+
+```
+List<SubscriberMethod> findSubscriberMethods(Class<?> subscriberClass) {
+    //从缓存中获取SubscriberMethod集合 
+    List<SubscriberMethod> subscriberMethods = METHOD_CACHE.get(subscriberClass);
+    if (subscriberMethods != null) {
+        return subscriberMethods;
+    }
+    //ignoreGeneratedIndex属性表示是否忽略注解器生成的MyEventBusIndex
+    if (ignoreGeneratedIndex) {
+        //通过反射获取subscriberMethods
+        subscriberMethods = findUsingReflection(subscriberClass);
+    } else {
+        subscriberMethods = findUsingInfo(subscriberClass);
+    }
+    //在获得subscriberMethods以后，如果订阅者中不存在@Subscribe注解并且为public的订阅方法，则会抛出异常。
+    if (subscriberMethods.isEmpty()) {
+        throw new EventBusException("Subscriber " + subscriberClass
+                + " and its super classes have no public methods with the @Subscribe annotation");
+    } else {
+        METHOD_CACHE.put(subscriberClass, subscriberMethods);
+        return subscriberMethods;
+    }
+}
+```
+
+1. 从缓存中查找，如果找到了就立马返回。
+2. 如果缓存中没有的话，则根据 ignoreGeneratedIndex 选择如何查找订阅方法，ignoreGeneratedIndex属性表示是否忽略注解器生成的MyEventBusIndex
+3. 找到订阅方法后，放入缓存，以免下次继续查找。
+
+ignoreGeneratedIndex 默认就是false，可以通过EventBusBuilder来设置它的值。我们在项目中经常通过EventBus单例模式来获取默认的EventBus对象，也就是ignoreGeneratedIndex为false的情况，这种情况调用了findUsingInfo方法：
+
+```
+private List<SubscriberMethod> findUsingInfo(Class<?> subscriberClass) {
+    FindState findState = prepareFindState();
+    findState.initForSubscriber(subscriberClass);
+    while (findState.clazz != null) {
+        //获取订阅者信息，没有配置MyEventBusIndex返回null
+        findState.subscriberInfo = getSubscriberInfo(findState);
+        if (findState.subscriberInfo != null) {
+            SubscriberMethod[] array = findState.subscriberInfo.getSubscriberMethods();
+            for (SubscriberMethod subscriberMethod : array) {
+                if (findState.checkAdd(subscriberMethod.method, subscriberMethod.eventType)) {
+                    findState.subscriberMethods.add(subscriberMethod);
+                }
+            }
+        } else {
+            //通过反射来查找订阅方法
+            findUsingReflectionInSingleClass(findState);
+        }
+        findState.moveToSuperclass();
+    }
+    return getMethodsAndRelease(findState);
+}
+```
+
+通过getSubscriberInfo方法来获取订阅者信息。
+在我们开始查找订阅方法的时候并没有忽略注解器为我们生成的索引MyEventBusIndex，如果我们通过EventBusBuilder配置了MyEventBusIndex，便会获取到subscriberInfo，调用subscriberInfo的getSubscriberMethods方法便可以得到订阅方法相关的信息，这个时候就不在需要通过注解进行获取订阅方法。如果没有配置MyEventBusIndex，便会执行findUsingReflectionInSingleClass方法，将订阅方法保存到findState中。最后再通过getMethodsAndRelease方法对findState做回收处理并反回订阅方法的List集合。
+
+看一下findUsingReflectionInSingleClass的执行过程：
+
+```
+private void findUsingReflectionInSingleClass(FindState findState) {
+    Method[] methods;
+    try {
+        // This is faster than getMethods, especially when subscribers are fat classes like Activities
+        methods = findState.clazz.getDeclaredMethods();
+    } catch (Throwable th) {
+        // Workaround for java.lang.NoClassDefFoundError, see https://github.com/greenrobot/EventBus/issues/149
+        methods = findState.clazz.getMethods();
+        findState.skipSuperClasses = true;
+    }
+    for (Method method : methods) {
+        int modifiers = method.getModifiers();
+        if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if (parameterTypes.length == 1) {
+                Subscribe subscribeAnnotation = method.getAnnotation(Subscribe.class);
+                if (subscribeAnnotation != null) {
+                    Class<?> eventType = parameterTypes[0];
+                    if (findState.checkAdd(method, eventType)) {
+                        ThreadMode threadMode = subscribeAnnotation.threadMode();
+                        findState.subscriberMethods.add(new SubscriberMethod(method, eventType, threadMode,
+                                subscribeAnnotation.priority(), subscribeAnnotation.sticky()));
+                    }
+                }
+            } else if (strictMethodVerification && method.isAnnotationPresent(Subscribe.class)) {
+                String methodName = method.getDeclaringClass().getName() + "." + method.getName();
+                throw new EventBusException("@Subscribe method " + methodName +
+                        "must have exactly 1 parameter but has " + parameterTypes.length);
+            }
+        } else if (strictMethodVerification && method.isAnnotationPresent(Subscribe.class)) {
+            String methodName = method.getDeclaringClass().getName() + "." + method.getName();
+            throw new EventBusException(methodName +
+                    " is a illegal @Subscribe method: must be public, non-static, and non-abstract");
+        }
+    }
+}
+```
+
+在这里主要是使用了Java的反射和对注解的解析。首先通过反射来获取订阅者中所有的方法。并根据方法的类型，参数和注解来找到订阅方法。找到订阅方法后将订阅方法相关信息保存到FindState当中。
+
+2.订阅者的注册过程
+
+```
+private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
+    Class<?> eventType = subscriberMethod.eventType;
+    //根据订阅者和订阅方法构造一个订阅事件
+    Subscription newSubscription = new Subscription(subscriber, subscriberMethod);
+    //获取当前订阅事件中Subscription的List集合
+    CopyOnWriteArrayList<Subscription> subscriptions = subscriptionsByEventType.get(eventType);
+    //该事件对应的Subscription的List集合不存在，则重新创建并保存在subscriptionsByEventType中
+    if (subscriptions == null) {
+        subscriptions = new CopyOnWriteArrayList<>();
+        subscriptionsByEventType.put(eventType, subscriptions);
+    } else {
+        //订阅者已经注册则抛出EventBusException
+        if (subscriptions.contains(newSubscription)) {
+            throw new EventBusException("Subscriber " + subscriber.getClass() + " already registered to event "
+                    + eventType);
+        }
+    }
+    //遍历订阅事件，找到比subscriptions中订阅事件小的位置，然后插进去
+    int size = subscriptions.size();
+    for (int i = 0; i <= size; i++) {
+        if (i == size || subscriberMethod.priority > subscriptions.get(i).subscriberMethod.priority) {
+            subscriptions.add(i, newSubscription);
+            break;
+        }
+    }
+     //通过订阅者获取该订阅者所订阅事件的集合
+    List<Class<?>> subscribedEvents = typesBySubscriber.get(subscriber);
+    if (subscribedEvents == null) {
+        subscribedEvents = new ArrayList<>();
+        typesBySubscriber.put(subscriber, subscribedEvents);
+    }
+    //将当前的订阅事件添加到subscribedEvents中
+    subscribedEvents.add(eventType);
+
+    if (subscriberMethod.sticky) {
+        if (eventInheritance) {
+            //粘性事件的处理
+            Set<Map.Entry<Class<?>, Object>> entries = stickyEvents.entrySet();
+            for (Map.Entry<Class<?>, Object> entry : entries) {
+                Class<?> candidateEventType = entry.getKey();
+                if (eventType.isAssignableFrom(candidateEventType)) {
+                    Object stickyEvent = entry.getValue();
+                    checkPostStickyEventToSubscription(newSubscription, stickyEvent);
+                }
+            }
+        } else {
+            Object stickyEvent = stickyEvents.get(eventType);
+            checkPostStickyEventToSubscription(newSubscription, stickyEvent);
+        }
+    }
+}
+```
+
+订阅的代码主要就做了两件事
+
+* 第一件事是将我们的订阅方法和订阅者封装到subscriptionsByEventType和typesBySubscriber中，subscriptionsByEventType是我们投递订阅事件的时候，就是根据我们的EventType找到我们的订阅事件，从而去分发事件，处理事件的；typesBySubscriber在调用unregister(this)的时候，根据订阅者找到EventType，又根据EventType找到订阅事件，从而对订阅者进行解绑。
+* 第二件事，如果是粘性事件的话，就立马投递、执行。
+
+![image](pic/p419.png)
+
+3、事件的发送
+
+```
+public void post(Object event) {
+    //PostingThreadState保存着事件队列和线程状态信息
+    PostingThreadState postingState = currentPostingThreadState.get();
+    List<Object> eventQueue = postingState.eventQueue;
+    /获取事件队列，并将当前事插入到事件队列中
+    eventQueue.add(event);
+
+    if (!postingState.isPosting) {
+        postingState.isMainThread = isMainThread();
+        postingState.isPosting = true;
+        if (postingState.canceled) {
+            throw new EventBusException("Internal error. Abort state was not reset");
+        }
+        try {
+            //处理队列中的所有事件
+            while (!eventQueue.isEmpty()) {
+                postSingleEvent(eventQueue.remove(0), postingState);
+            }
+        } finally {
+            postingState.isPosting = false;
+            postingState.isMainThread = false;
+        }
+    }
+}
+```
+
+* 从PostingThreadState对象中取出事件队列
+* 将当前的事件插入到事件队列当中
+* 将队列中的事件依次交由postSingleEvent方法进行处理，并移除该事件。
+
+```
+private void postSingleEvent(Object event, PostingThreadState postingState) throws Error {
+    Class<?> eventClass = event.getClass();
+    boolean subscriptionFound = false;
+    //eventInheritance表示是否向上查找事件的父类,默认为true
+    if (eventInheritance) {
+        List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
+        int countTypes = eventTypes.size();
+        for (int h = 0; h < countTypes; h++) {
+            Class<?> clazz = eventTypes.get(h);
+            subscriptionFound |= postSingleEventForEventType(event, postingState, clazz);
+        }
+    } else {
+        subscriptionFound = postSingleEventForEventType(event, postingState, eventClass);
+    }
+    //找不到该事件时的异常处理
+    if (!subscriptionFound) {
+        if (logNoSubscriberMessages) {
+            logger.log(Level.FINE, "No subscribers registered for event " + eventClass);
+        }
+        if (sendNoSubscriberEvent && eventClass != NoSubscriberEvent.class &&
+                eventClass != SubscriberExceptionEvent.class) {
+            post(new NoSubscriberEvent(this, event));
+        }
+    }
+}
+```
+
+eventInheritance表示是否向上查找事件的父类,它的默认值为true，可以通过在EventBusBuilder中来进行配置。当eventInheritance为true时，则通过lookupAllEventTypes找到所有的父类事件并存在List中，然后通过postSingleEventForEventType方法对事件逐一处理
+
+```
+private boolean postSingleEventForEventType(Object event, PostingThreadState postingState, Class<?> eventClass) {
+    CopyOnWriteArrayList<Subscription> subscriptions;
+    //取出该事件对应的Subscription集合
+    synchronized (this) {
+        subscriptions = subscriptionsByEventType.get(eventClass);
+    }
+    if (subscriptions != null && !subscriptions.isEmpty()) {
+       //将该事件的event和对应的Subscription中的信息（包扩订阅者类和订阅方法）传递给postingState
+        for (Subscription subscription : subscriptions) {
+            postingState.event = event;
+            postingState.subscription = subscription;
+            boolean aborted = false;
+            try {
+                //对事件进行处理
+                postToSubscription(subscription, event, postingState.isMainThread);
+                aborted = postingState.canceled;
+            } finally {
+                postingState.event = null;
+                postingState.subscription = null;
+                postingState.canceled = false;
+            }
+            if (aborted) {
+                break;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+```
+
+同步取出该事件对应的Subscription集合并遍历该集合将事件event和对应Subscription传递给postingState并调用postToSubscription方法对事件进行处理
+
+```
+private void postToSubscription(Subscription subscription, Object event, boolean isMainThread) {
+    switch (subscription.subscriberMethod.threadMode) {
+        case POSTING:
+            invokeSubscriber(subscription, event);
+            break;
+        case MAIN:
+            if (isMainThread) {
+                invokeSubscriber(subscription, event);
+            } else {
+                mainThreadPoster.enqueue(subscription, event);
+            }
+            break;
+        case MAIN_ORDERED:
+            if (mainThreadPoster != null) {
+                mainThreadPoster.enqueue(subscription, event);
+            } else {
+                // temporary: technically not correct as poster not decoupled from subscriber
+                invokeSubscriber(subscription, event);
+            }
+            break;
+        case BACKGROUND:
+            if (isMainThread) {
+                backgroundPoster.enqueue(subscription, event);
+            } else {
+                invokeSubscriber(subscription, event);
+            }
+            break;
+        case ASYNC:
+            asyncPoster.enqueue(subscription, event);
+            break;
+        default:
+            throw new IllegalStateException("Unknown thread mode: " + subscription.subscriberMethod.threadMode);
+    }
+}
+```
+
+取出订阅方法的线程模式，之后根据线程模式来分别处理。举个例子，如果线程模式是MAIN，提交事件的线程是主线程的话则通过反射，直接运行订阅的方法，如果不是主线程，我们需要mainThreadPoster将我们的订阅事件入队列，mainThreadPoster是HandlerPoster类型的继承自Handler，通过Handler将订阅方法切换到主线程执行。
+
+![image](pic/p420.png)
+
+4、订阅者取消注册
+
+```
+public synchronized void unregister(Object subscriber) {
+    List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
+    if (subscribedTypes != null) {
+        for (Class<?> eventType : subscribedTypes) {
+            unsubscribeByEventType(subscriber, eventType);
+        }
+        typesBySubscriber.remove(subscriber);
+    } else {
+        logger.log(Level.WARNING, "Subscriber to unregister was not registered before: " + subscriber.getClass());
+    }
+}
+```
+
+typesBySubscriber我们在订阅者注册的过程中讲到过这个属性，他根据订阅者找到EventType，然后根据EventType和订阅者来得到订阅事件来对订阅者进行解绑。
+
+![image](pic/p421.png)
+
+三、核心架构与利弊
+
+1、核心架构
+
+![image](pic/p422.png)
+
+从EventBus作者提供的图我们可以看到EventBus的核心架构，其实就是基于观察者模式来实现的
+
+2、利与弊
+
+EventBus好处比较明显，它能够解耦和，将业务和视图分离，代码实现比较容易。而且3.0后，我们可以通过apt预编译找到订阅者，避免了运行期间的反射处理解析，大大提高了效率。当然EventBus也会带来一些隐患和弊端，如果滥用的话会导致逻辑的分散并造成维护起来的困难。另外大量采用EventBus代码的可读性也会变差。
 
 
 

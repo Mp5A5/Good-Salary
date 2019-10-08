@@ -2,85 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Test.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/node/Node.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/HungrySingleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/LazyCASSingleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/LazyClazzSingleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/singleton/LazyDCLSingleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/BubbleSort.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/MergeSort.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/QuickSort.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/ShellSort.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/Demo01.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/Dispatch.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/DynamicDispatch.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/StaticDispatch.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Cat.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/CockerSpaniel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Dog.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Friendly.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/dynamic/Tester.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jvm/stack/StackDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/Lock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/SpinLock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/consumer/TestProductConsumerLock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/consumer/TestProductConsumerSny.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/dead/DeadLock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/dead/SynThread1.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/dead/SyncThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/test/TestLock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/lock/test/Ticket.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/hungry/Singleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/hungry/SingletonEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonBase.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonCAS.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonClazz.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonDCL.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/lazy/SingletonSyn.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/singleton/test/Singleton.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/CallableTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/RTDifferThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/RunnableDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/RunnableTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/TestVolatile.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/ThreadDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/ThreadJoinDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/ThreadLocalDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/ThreadSleepDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/ThreadTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/VolatileDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ErrorThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/Interrupted.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/Test.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ThreadFlagUnSafe.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ThreadStopSafeInterrupted.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/ThreadStopUnSafe.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/breakThread/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/control/SemaphoreThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/poll/CachedThreadPool.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/priority/ThreadPriorityDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/sleep/Service.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/sleep/SleepThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/sleep/Test.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/sleep/WaitThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/syn/CountDownLatchTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/syn/CyclicBarrierTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/syn/MySynchronizerTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/syn/SyncMethodTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/syn/ThreadLocalTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/wait/Service.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/wait/SleepThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/wait/Test.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/wait/WaitThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/thread/yield/ThreadYieldDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest01.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/BubbleSortTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/BubbleSortTest01.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/MergeSortTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/QuickSortTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/QuickSortTest01.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/ShellSortTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/collection/HashTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/collection/HashTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/collection/HashTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/collection/HashTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pic/p25.png" beforeDir="false" afterPath="$PROJECT_DIR$/../pic/p25.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../关键字.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../数据结构.md" beforeDir="false" afterPath="$PROJECT_DIR$/../数据结构.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithm/sort/MergeSort.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/sort/MergeSort.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -179,7 +113,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Test">
+  <component name="RunManager" selected="Application.MergeSortTest">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
@@ -214,13 +148,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StaticDispatch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="jvm.StaticDispatch" />
+    <configuration name="MergeSortTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="algorithm.sort.MergeSortTest" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="jvm.*" />
+          <option name="PATTERN" value="algorithm.sort.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -283,11 +217,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MergeSortTest" />
         <item itemvalue="Application.Test" />
         <item itemvalue="Application.Tester" />
         <item itemvalue="Application.Dispatch" />
         <item itemvalue="Application.DynamicDispatch" />
-        <item itemvalue="Application.StaticDispatch" />
       </list>
     </recent_temporary>
   </component>
@@ -375,6 +309,11 @@
       <workItem from="1567701008584" duration="7383000" />
       <workItem from="1569402501099" duration="670000" />
       <workItem from="1569467806438" duration="3538000" />
+      <workItem from="1569538895227" duration="191000" />
+      <workItem from="1569539288387" duration="2534000" />
+      <workItem from="1570251031948" duration="926000" />
+      <workItem from="1570414459546" duration="50000" />
+      <workItem from="1570414560312" duration="7303000" />
     </task>
     <servers />
   </component>

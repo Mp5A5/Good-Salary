@@ -1,13 +1,9 @@
 package algorithm.sort;
 
-import org.junit.jupiter.api.Test;
+/** 作者：王文彬 on 2019/10/7 12：10 邮箱：wwb199055@126.com */
+public class MergeSortTest {
 
-import java.util.Arrays;
-
-/** 作者：王文彬 on 2019/9/3 11：23 邮箱：wwb199055@126.com */
-public class MergeSort {
-
-  public int[] sort(int[] srcArray) {
+  public int[] mergeSort(int[] srcArray) {
     return divide(srcArray, 0, srcArray.length - 1);
   }
 
@@ -42,11 +38,5 @@ public class MergeSort {
       }
     }
     return srcArray;
-  }
-
-  @Test
-  public void test() {
-    int[] a = {1, 10, 8, 7, 4, 3};
-    System.out.println(Arrays.toString(sort(a)));
   }
 }
