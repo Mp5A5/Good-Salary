@@ -4216,11 +4216,808 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
 
 2、ViewGroup事件的分发机制
 
+1.判断要不要分发本次触摸事件
+
+```
+if (onFilterTouchEventForSecurity(ev)) {
+    // 获取MotionEvent的事件类型
+    final int action = ev.getAction();
+    // actionMasked能够区分出多点触控事件
+    final int actionMasked = action & MotionEvent.ACTION_MASK;
+    ...
+```
+
+首先通过```onFilterTouchEventForSecurity(ev)```检查要不要分发本次事件，检查通过了才会进行分发，走if中的逻辑。否则就放弃对本次事件的处理。
+
+```
+public boolean onFilterTouchEventForSecurity(MotionEvent event) {
+    if (// 先检查View有没有设置被遮挡时不处理触摸事件的flag
+        (mViewFlags & FILTER_TOUCHES_WHEN_OBSCURED) != 0
+            // 再检查受到该事件的窗口是否被其它窗口遮挡
+            && (event.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0) {
+        // Window is obscured, drop this touch.
+        return false;
+    }
+    return true;
+}
+```
+
+* 第一个条件FILTER_TOUCHES_WHEN_OBSCURED可以通过在xml文件中的android:filterTouchesWhenObscured来设置，或者在Java中通过setFilterTouchesWhenObscured()来添加或移除。DecorView默认是没有这个标志位的，而其他View基本上默认都是有的。Android这样设计是为了让我们可以自主的选择要不要过滤不安全事件。如果我们让自己的View不过滤这样的事件，那么在一个事件流进行中，如果突然弹出一个新窗口，我们的View仍然能接收到触摸事件。
+* 第二个条件是在本次触摸事件分发到ViewGroup所在窗口时，判断窗口如果处于被其它窗口遮挡的状态的话，就会给这个MotionEvent加上这个标志位。
+
+> 知识点：通过设置或清除FILTER_TOUCHES_WHEN_OBSCURED标志位，可以控制在事件流过程中，突然弹出窗口后，后续事件流是否还能继续处理。
+
+接下来是获取当前触摸事件的类型，可以看到这里获取了ACTION_MASK。action的值包括了触摸事件的类型和触摸事件的索引（Android中在一条16位指令的高8位中储存触摸事件的索引，在低8位中储存触摸事件的类型），而actionMask仅仅包括事件类型。对于多点触控，我们需要获取到索引信息才能区分不同的触摸点，进行操作。
+
+2.ACTION_DOWN会重置状态
+
+```
+if (actionMasked == MotionEvent.ACTION_DOWN) {
+    // 清理上一次接收触摸事件的View的状态
+    cancelAndClearTouchTargets(ev);
+    // 重置ViewGroup的触摸相关状态
+    resetTouchState();
+}
+```
+
+这一步会先判断是不是ACTION_DWON事件，如果是的话需要进行一些重置，防止对新的事件流产生影响。下面我们看看上段代码中调用的两个重置方法吧。
+
+```
+private void cancelAndClearTouchTargets(MotionEvent event) {
+    // 如果触摸事件目标队列不为空才执行后面的逻辑
+    if (mFirstTouchTarget != null) {
+        boolean syntheticEvent = false;
+        if (event == null) {
+            final long now = SystemClock.uptimeMillis();
+            // 自己创建一个ACTION_CANCEL事件
+            event = MotionEvent.obtain(now, now,
+                    MotionEvent.ACTION_CANCEL, 0.0f, 0.0f, 0);
+            // 设置事件源类型为触摸屏幕
+            event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            // 标记一下，这是一个合成事件
+            syntheticEvent = true;
+        }
+        // TouchTarget是一个链表结构，保存了事件传递的子一系列目标View
+        for (TouchTarget target = mFirstTouchTarget; target != null; target = target.next) {
+            // 检查View是否设置了暂时不在接收事件的标志位，如果有清除该标志位
+            // 这样该View就能够接收下一次事件了。
+            resetCancelNextUpFlag(target.child);
+            // 将这个取消事件传给子View
+            dispatchTransformedTouchEvent(event, true, target.child, target.pointerIdBits);
+        }
+        // 清空触摸事件目标队列
+        clearTouchTargets();
+        if (syntheticEvent) {
+            // 如果是合成事件，需要回收它
+            event.recycle();
+        }
+    }
+}
+```
+
+```cancelAndClearTouchTargets(ev)```流程不长，它就是清除上一次触摸事件流中能够接收事件的所有子View的PFLAG_CANCEL_NEXT_UP_EVENT标志，并且模拟了一个ACTION_CANCEL事件分发给它们。
+
+一个View如果有PFLAG_CANCEL_NEXT_UP_EVENT标志，表示它跟ViewGroup解除了绑定，通常会在调用ViewGroup#detachViewFromParent(View)后被添加。一般不会有这个标记的。
+
+给上一次接收事件流的子View发送模拟的ACTION_CANCEL事件，可以重置这些子View的触摸状态。比如取消它们的点击或者长按事件。
+
+这里先讲一下能够接收触摸事件流的子View怎么被记录的。其实就是使用一个TouchTarget去记录，它是一个单链表结构，并且有复用机制，设计的比较巧妙。下面是TouchTarget中的与我们关连最大的两个成员。
+
+```
+// 用来保存能够处理触摸事件的View
+public View child;
+// 指向下一个TouchTarget
+public TouchTarget next;
+```
+
+不难看出，每一个能够接收触摸事件流的子View都对应着一个TouchTarget。
+
+mFirstTouchTarget是ViewGroup的成员变量，用来记录当前触摸目标链表的起始对象。
+
+```
+private void resetTouchState() {
+    // 再清除一次事件传递链中的View
+    clearTouchTargets();
+    // 再次清除View中不接收TouchEvent的标志
+    resetCancelNextUpFlag(this);
+    // 设置为允许拦截事件
+    mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT;
+    mNestedScrollAxes = SCROLL_AXIS_NONE;
+}
+```
+
+这个方法后中就是把触摸链表清空了，然后清除ViewGroup的PFLAG_CANCEL_NEXT_UP_EVENT标志，如果有的话。然后清除FLAG_DISALLOW_INTERCEPT标志
+
+3.检查ViewGroup要不要拦截事件
+
+```
+// 这个变量用于检查是否拦截这个TouchEvent
+final boolean intercepted;
+if (actionMasked == MotionEvent.ACTION_DOWN 
+        || mFirstTouchTarget != null) {
+        
+    // 检查是否不允许拦截事件
+    final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+    if (!disallowIntercept) {
+        // 如果没有不允许拦截，就是允许拦截。
+        // 调用onInterceptTouchEvent看ViewGroup是否拦截事件
+        intercepted = onInterceptTouchEvent(ev);
+        // 在这里防止Event中途被篡改
+        // 所以要篡改TouchEvent的Action不要在这之前改
+        ev.setAction(action); // restore action in case it was changed
+    } else {
+        // 不允许拦截就直接设置为false
+        intercepted = false;
+    }
+} else {
+    // There are no touch targets and this action is not an initial down
+    // so this view group continues to intercept touches.
+    // 如果没有子View，并且也不是ACTION_DOWN事件，直接设置为拦截
+    // 这样后面就自己处理事件
+    intercepted = true;
+}
+```
+
+* 第一个if中的判断限制了，必须是ACTION_DOWN事件，或者mFirstTouchTarget != null才会询问onInterceptTouchEvent()要不要拦截事件，否则ViewGroup就直接拦截了。
+* 在第二个if的逻辑中，我们看到它先检查ViewGroup是否有FLAG_DISALLOW_INTERCEPT标志，如果有就直接不进行拦截，如果没有才会询问onInterceptTouchEvent()要不要拦截。这个标志在上一步中也出现了，只不过是清理掉它，所以ACTION_DOWN发生时，ViewGroup肯定是没这个标志的。那什么时候可能会有呢？只有在有子View处理触摸事件流的过程中，有子View调用```requestDisallowInterceptTouchEvent()```，可以给ViewGroup添加这个标志位。
+
+> 知识点：如果子View在ACTION_DWON时处理了事件，那么后面可以通过requestDisallowInterceptTouchEvent(true)来禁止父View拦截后续事件。
+
+一个纵向滑动的RecyclerView嵌套一个横向滑动的RecyclerView时之所以在触发横向滑动后，就再不能触发纵向滑动，就是因为RecyclerView在发生横滑时调用了requestDisallowInterceptTouchEvent(true)禁止父View再拦截事件。
+
+4.初始化用于后续判断的变量
+
+```
+// 标识本次事件需不需要取消
+final boolean canceled = resetCancelNextUpFlag(this)
+        || actionMasked == MotionEvent.ACTION_CANCEL;
+// 检查父View是否支持多点触控，即将多个TouchEvent分发给子View，
+// 通过setMotionEventSplittingEnabled()可以修改这个值。
+// FLAG_SPLIT_MOTION_EVENTS在3.0是默认为true的，即支持多点触控的分发。
+final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;
+TouchTarget newTouchTarget = null;
+boolean alreadyDispatchedToNewTouchTarget = false;
+```
+
+5.判断是否要给子View分发事件
+
+```
+if (!canceled && !intercepted) {
+    // 检查TouchEvent是否可以触发View获取焦点，如果可以，查找本View中有没有获得焦点的子View，
+    // 有就获取它，没有就为null
+    View childWithAccessibilityFocus = ev.isTargetAccessibilityFocus()
+            ? findChildWithAccessibilityFocus() : null;
+```
+
+从这个if可以看出，只有不需要发送取消事件，并且ViewGroup没有拦截事件时才会进行分发。
+
+上面代码中，还尝试获取了一下ViewGroup中当前获得焦点的View，这个在后面的判断中会用到。
+
+6.判断是不是DOWN事件
+
+```
+// 可以执行if里面的情况：
+// 1. ACTION_DOWN事件
+// 2. 支持多点触控且是ACTION_POINTER_DOWN事件，即新的事件流的DOWN事件
+// 3. 需要鼠标等外设支持，暂时无意义
+// 就是说同一个事件流，只有Down的时候才会去寻找谁要处理它，
+// 如果找到了后面的事件直接让它处理，否则后面的事件会直接让父View处理
+if (actionMasked == MotionEvent.ACTION_DOWN
+        || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
+        || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
+    // 获取当前触摸手指在多点触控中的排序
+    // 这个值可能因为有手指发生Down或Up而发生改变
+    final int actionIndex = ev.getActionIndex(); // always 0 for down
+    // 标识当前是那一个点的触摸事件
+    final int idBitsToAssign = split ? 1 <<
+            // 此时获取到手指的Id，这个值在Down到Up这个过程中是不会改变的
+            ev.getPointerId(actionIndex)
+            : TouchTarget.ALL_POINTER_IDS;
+    // Clean up earlier touch targets for this pointer id in case they
+    // have become out of sync.
+    // 清理之前触摸事件中的目标
+    removePointersFromTouchTargets(idBitsToAssign);
+```
+
+这个if判断当前的触摸事件类型是不是DOWN类型，如果是才会进入if开始真正的遍历给子View分发事件。也就是说，一个事件流只有一开始的DOWN事件才会去遍历分发事件，后面的事件将不再通过遍历分发，而是直接发到触摸目标队列的View中去。
+
+7.初始化子View集合
+
+```
+// 子View数量
+final int childrenCount = mChildrenCount;
+// 第一个点的Down事件newTouchTarget肯定为null，后面的点的Down事件就可能有值了
+// 所以只有第一个点的Down事件时走if中逻辑
+if (newTouchTarget == null && childrenCount != 0) {
+    final float x = ev.getX(actionIndex);
+    final float y = ev.getY(actionIndex);
+    // Find a child that can receive the event.
+    // Scan children from front to back.
+    // 将所有子View放到集合中，按照添加顺序排序，但是受到Z轴影响
+    // 只有子View数量大于1，并且其中至少有一个子View的Z轴不为0，它才不为null
+    // 7.0中，View的elevation默认为0
+    final ArrayList<View> preorderedList = buildTouchDispatchChildList();
+    // 如果preorderedList为空，并且按炸后
+    final boolean customOrder = preorderedList == null
+      //检查ViewGroup中的子视图是否是按照顺序绘制，其实就是不受z轴影响
+            && isChildrenDrawingOrderEnabled();
+    final View[] children = mChildren;
+```
+
+这一步中，获取了触摸事件的坐标，然后初始化了preorderedList和mChildren两个子View集合。为什么需要两个呢？肯定是有所区别的。先看看preorderedList。
+
+通过buildTouchDispatchChildList()构建出来的子View集合有如下特点：
+
+* 如果ViewGroup的子View数量不多于一个，为null；
+* 如果ViewGroup的所有子View的z轴都为0，为null；
+* 子View的排序和mChildren一样，是按照View添加顺序从前往后排的，但是还会受到子View z轴的影响。z轴较大的子View会往后排。
+
+mChildren上面说过，就是按照View添加顺序从前往后排的。
+
+所以，这两个子View集合的最大区别就是preorderedList中z轴较大的子View会往后排。
+
+8.开始遍历寻找能够处理事件的子View
+
+```
+// 开始遍历子View啦，从后往前遍历
+for (int i = childrenCount - 1; i >= 0; i--) {
+    // 7.0就是i
+    final int childIndex = getAndVerifyPreorderedIndex(
+            childrenCount, i, customOrder);
+    // 如果preorderedList不为空，从preorderedList中取View
+    // 如果preorderedList为空，从mChildren中取View
+    final View child = getAndVerifyPreorderedView(
+            preorderedList, children, childIndex);
+    // 如果当前已经有View获得焦点了，找到它。后面的触摸事件会优先传给它。
+    // 应该主要影响后面触摸点的Down事件
+    if (childWithAccessibilityFocus != null) {
+        if (childWithAccessibilityFocus != child) {
+            continue;
+        }
+        childWithAccessibilityFocus = null;
+        // 找到后i设为最后一个View
+        i = childrenCount - 1;
+    }
+```
+
+可以看到，对子View集合的遍历是倒序的。这就是为什么覆盖在上层的View总是能有限获取到事件的原因。
+
+通过getAndVerifyPreorderedView()从preorderedList或者mChildren中取到一个子View。然后如果ViewGroup中有子View获得了焦点，那么就会去找到这个获得焦点的子View。注意，如果找到了会执行i = childrenCount - 1，这意味for中的逻辑执行完就结束了，如果中途有continue的操作，就直接退出循环。
+
+9.检查事件是否在View内
+
+```
+// 检查View是否显示或者播放动画以及TouchEvent点是否在View内
+// 如果不满足会继续寻找满足的子View
+if (!canViewReceivePointerEvents(child)
+        || !isTransformedTouchPointInView(x, y, child, null)) {
+    ev.setTargetAccessibilityFocus(false);
+    continue;
+}
+```
+
+如果上一步找到了获取焦点的View，并且触摸事件又没在焦点View中，退出循环。
+
+如果没有任何的子View包含触摸点，也退出循环。
+
+如果没有View获得焦点，就直到找到包含触摸点的View才会继续往下执行。
+
+10.进行DOWN事件的分发
+
+```
+// 再次重置View
+resetCancelNextUpFlag(child);
+// 将事件传给子View，看子View有没有消费，消费了执行if中逻辑，并结束循环。
+// 就是说该View之后的子View将都不能接收到这个TouchEvent了
+if (dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)) {
+    // 记录这次TouchEvent按下的时间
+    mLastTouchDownTime = ev.getDownTime();
+    if (preorderedList != null) {
+        // childIndex points into presorted list, find original index
+        for (int j = 0; j < childrenCount; j++) {
+            if (children[childIndex] == mChildren[j]) {
+                // 记录触摸的View的位置
+                // 然后结束本次事件传递
+                mLastTouchDownIndex = j;
+                break;
+            }
+        }
+    } else {
+        // 记录触摸的View的位置
+        mLastTouchDownIndex = childIndex;
+    }
+    mLastTouchDownX = ev.getX();
+    mLastTouchDownY = ev.getY();
+    // 创建一个TouchTarget
+    newTouchTarget = addTouchTarget(child, idBitsToAssign);
+    // 标记已经把事件分发给了newTouchTarget，退出子View遍历
+    alreadyDispatchedToNewTouchTarget = true;
+    break;
+}
+```
+
+一开始再一次的尝试清除子View的PFLAG_CANCEL_NEXT_UP_EVENT标志。然后在给子View分发事件，如果子View处理了，走if中逻辑，如果没处理，继续寻找下一个满足条件的View，然后看它处不处理。
+
+这里插入讲解一下dispatchTransformedTouchEvent()方法。这个方法在第一步的cancelAndClearTouchTargets()方法中也出现过，当时是用它来给子View分发取消事件。下面同样分段来讲解这个方法。
+
+```
+private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
+        View child, int desiredPointerIdBits) {
+    final boolean handled;
+    // 先记录原本的Action
+    final int oldAction = event.getAction();
+    if (cancel || oldAction == MotionEvent.ACTION_CANCEL) {
+        // 可能过来的事件没有ACTION_CANCEL，如果希望取消的话，那么为事件添加取消标志。
+        event.setAction(MotionEvent.ACTION_CANCEL);
+        if (child == null) {
+            // 如果没有子View了，调用View中的dispatchTouchEvent
+            // 进而调用View的onTouch或者onTouchEvent方法，触发ACTION_CANCEL逻辑
+            handled = super.dispatchTouchEvent(event);
+        } else {
+            // 如果有子View，将这个取消事件传递给子View
+            handled = child.dispatchTouchEvent(event);
+        }
+        // 在设置回原本的Action
+        // 此时TouchEvent的行为相当于没变
+        // 但是却把该ViewGroup的
+        event.setAction(oldAction);
+        return handled;
+    }
+    ...
+```
+
+这一段代码实现的功能就是：如果需要分发取消事件，那么就会分发取消事件。如果有目标子View则将取消事件分发给目标子View，如果没有就分发给ViewGroup自己，走的是View的dispatchTouchEvent()，和普通View一样。
+
+如果不需要分发取消事件，就走下面一般事件的分发流程。
+
+```
+private boolean dispatchTransformedTouchEvent(MotionEvent event, boolean cancel,
+        View child, int desiredPointerIdBits) {
+    final boolean handled;
+    ...
+    // 获取触摸事件的触摸点id
+    final int oldPointerIdBits = event.getPointerIdBits();
+    // 看和期望的触摸点是不是一个
+    final int newPointerIdBits = oldPointerIdBits & desiredPointerIdBits;
+    if (newPointerIdBits == 0) {
+        // 表示不是
+        return false;
+    }
+    final MotionEvent transformedEvent;
+    // 如果是同一个触摸点，进入if逻辑
+    if (newPointerIdBits == oldPointerIdBits) {
+        if (child == null || child.hasIdentityMatrix()) {
+            if (child == null) {
+                // 如果不给子传事件，自己在onTouch或onTouchEvent中处理
+                handled = super.dispatchTouchEvent(event);
+            } else {
+                final float offsetX = mScrollX - child.mLeft;
+                final float offsetY = mScrollY - child.mTop;
+                // 根据滚动值计算触摸事件的偏移位置
+                event.offsetLocation(offsetX, offsetY);
+                // 让子View处理事件
+                handled = child.dispatchTouchEvent(event);
+                // 恢复TouchEvent坐标到原来位置，避免影响后面的流程
+                event.offsetLocation(-offsetX, -offsetY);
+            }
+            return handled;
+        }
+        transformedEvent = MotionEvent.obtain(event);
+    } else {
+        transformedEvent = event.split(newPointerIdBits);
+    }
+    ...
+    if (child == null) {
+        handled = super.dispatchTouchEvent(transformedEvent);
+    } else {
+        final float offsetX = mScrollX - child.mLeft;
+        final float offsetY = mScrollY - child.mTop;
+        // 根据滚动值计算触摸事件的偏移位置
+        transformedEvent.offsetLocation(offsetX, offsetY);
+        if (! child.hasIdentityMatrix()) {
+            transformedEvent.transform(child.getInverseMatrix());
+        }
+        // 让子View处理事件
+        handled = child.dispatchTouchEvent(transformedEvent);
+    }
+    // Done.
+    transformedEvent.recycle();
+    return handled;
+}
+```
+
+开始先判断所指的是不是同一个触摸点，如果是的话再判断传入的child为不为空，或者传入的child的变换矩阵还是不是单位矩阵。如果满足再看传入的child为不为null，如果为空说明需要让ViewGroup去处理事件，反之将把事件分发给child处理。
+
+如果是把事件分发给child的话，接下来会计算事件的偏移量。因为child在ViewGroup中可能会发生位置变化，需要除去这些移动距离，以保证事件到达child的onTouchEvent()中时，能够正确的表示它在child中的相对坐标。就相当于事件也要跟着child的偏移而偏移。
+
+可以看到，在进行事件传递时，会根据本次触摸事件构建出一个临时事件transformedEvent，然后用临时事件去分发。这样做的目的是为了防止事件传递过程中被更改。
+
+所以，这个方法主要就是用来根据参数把一个事件分发到指定View的。
+
+我们回到dispatchTouchEvent()中继续。如果if中的dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)返回true，表示子View处理了本事件，那么接着会创建一个TouchTarget，并且关联该子View，后续的触摸事件就会通过这个TouchTarget取出子View，直接把事件分发给它。我们看看这里TouchTarget的创建。
+
+```
+private TouchTarget addTouchTarget(@NonNull View child, int pointerIdBits) {
+    final TouchTarget target = TouchTarget.obtain(child, pointerIdBits);
+    target.next = mFirstTouchTarget;
+    mFirstTouchTarget = target;
+    return target;
+}
+```
+
+注意啦，创建之后还给mFirstTouchTarget赋值了，从此，mFirstTouchTarget就不为空了。
+
+最后，在有子View消费本次Down事件后，会执行alreadyDispatchedToNewTouchTarget = true，标记一下已经有子View消费了事件。然后退出循环遍历，其余还没遍历到的子将收不到该触摸事件。
+
+11.处理多点触控
+
+```
+// newTouchTarget在不是Down事件，或者没有找到处理事件的View时是null
+// mFirstTouchTarget在Down事件时，如果找到了处理的View就不为null
+if (newTouchTarget == null && mFirstTouchTarget != null) {
+    // 直接让上次处理的View继续处理
+    newTouchTarget = mFirstTouchTarget;
+    while (newTouchTarget.next != null) {
+        newTouchTarget = newTouchTarget.next;
+    }
+    newTouchTarget.pointerIdBits |= idBitsToAssign;
+}
+```
+
+if中的代码只有在多点触控中才能执行。
+
+12.处理后续事件
+
+```
+if (mFirstTouchTarget == null) {
+    // No touch targets so treat this as an ordinary view.
+    // 父View自己处理事件
+    handled = dispatchTransformedTouchEvent(ev, canceled, null,
+            TouchTarget.ALL_POINTER_IDS);
+} else {
+    TouchTarget predecessor = null;
+    TouchTarget target = mFirstTouchTarget;
+    while (target != null) {
+        final TouchTarget next = target.next;
+        // 只有down时，并且有View处理了事件才会走if中逻辑
+        if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
+            // 表示触摸事件已经被子View处理，并且找到了子View，设置处理标记为true
+            handled = true;
+        } else {
+            // 父View拦截，或者child原本不可接收TouchEvent的状态，为true
+            final boolean cancelChild = resetCancelNextUpFlag(target.child)
+                    || intercepted;
+            // 如果事件被父View拦截了，或者child原本被打上了暂时不可接收TouchEvent的标记PFLAG_CANCEL_NEXT_UP_EVENT
+            // 给它发送取消事件
+            // 如果父View没有拦截，并且子View原本没有PFLAG_CANCEL_NEXT_UP_EVENT
+            // 给它分发事件
+            if (dispatchTransformedTouchEvent(ev, cancelChild,
+                    target.child, target.pointerIdBits)) {
+                handled = true;
+            }
+            if (cancelChild) {
+                if (predecessor == null) {
+                    mFirstTouchTarget = next;
+                } else {
+                    predecessor.next = next;
+                }
+                target.recycle();
+                target = next;
+                continue;
+            }
+        }
+        predecessor = target;
+        target = next;
+    }
+}
+```
+
+
+如果Down事件没有子View处理，mFirstTouchTarget肯定会为null，所以在这里把事件分发给ViewGroup的onTouchEvent()自己处理。
+
+如果Down事件有子View处理，那么会通过alreadyDispatchedToNewTouchTarget看是不是接着上面找到处理事件的子View的逻辑，如果是的话直接标记本次Down事件已经被处理。
+
+如果是非Down事件，则通过TouchTarget拿到能够处理事件的View，然后给它分发事件。
+
+上面的代码中，需要注意这里：
+
+```
+final boolean cancelChild = resetCancelNextUpFlag(target.child)
+        || intercepted;
+...
+if (cancelChild) {
+    if (predecessor == null) {
+        mFirstTouchTarget = next;
+    } else {
+        predecessor.next = next;
+    }
+    target.recycle();
+    target = next;
+    continue;
+}
+```
+
+> 知识点：如果父View中途拦截了子View的触摸事件流，那么事件流中的后续事件将都被父View拦截，并且不能取消拦截。
+
+1. 如果一个View想要处理触摸事件，需要在onTouchEvent()或onTouch()中接收ACTION_DOWN时返回true，通知父View。否则该事件流中的后续事件就不会再往该View中分发了。
+2. 如果一个父View拦截了一个事件，那么从这个事件开始之后的事件都不会在分发到子View中，同时父View也不会再询问onInterceptTouchEvent()是否拦截，而是直接拦截事件。并且会给之前处理事件的子View分发一个ACTION_CANCEL事件，让子View停止处理事件。
+3. 在父View拦截事件前，可以子View可以通过requestDisallowInterceptTouchEvent()方法给父View添加FLAG_DISALLOW_INTERCEPT标志，使父View不能再拦截事件。
+4. 通过setFilterTouchesWhenObscured()或者在xml中设置android:filterTouchesWhenObscured来自行决定要不要在窗口被遮挡时继续处理事件。
+5. 触摸事件的分发是按View添加的顺序逆序分发的，所以在上层的View总能优先收到事件。如果ViewGruop设置了FLAG_USE_CHILD_DRAWING_ORDER标志，即开启按z轴顺序绘制，则z轴值最大的子View将优先收到事件。
+
 ![image](pic/p350.png)
 
 3、View事件的分发机制
 
+```
+public boolean dispatchTouchEvent(MotionEvent event) {
+    ...
+    final int actionMasked = event.getActionMasked();
+    ...
+    if (onFilterTouchEventForSecurity(event)) {
+        // 是否是enable可点击的 && 通过鼠标操作滚动条
+        if ((mViewFlags & ENABLED_MASK) == ENABLED && handleScrollBarDragging(event)) {
+            result = true;
+        }
+        // 首先会判断当前View有没有设置OnTouchListener，
+        // 如果OnTouchListener中的onTouch方法返回true，那么onTouchEvent方法就不会被调用，
+        // 可见OnTouchListener的优先级要高于onTouchEvent，这样做的好处是方便在外界处理点击事件。
+        ListenerInfo li = mListenerInfo;
+        if (li != null && li.mOnTouchListener != null
+                && (mViewFlags & ENABLED_MASK) == ENABLED
+                && li.mOnTouchListener.onTouch(this, event)) {
+            result = true;
+        }
+
+        if (!result && onTouchEvent(event)) {
+            result = true;
+        }
+    }
+   ...
+    return result;
+}
+```
+
+1.View的onTouchEvent
+
+```
+public boolean onTouchEvent(MotionEvent event) {
+    final float x = event.getX();
+    final float y = event.getY();
+    final int viewFlags = mViewFlags;
+    final int action = event.getAction();
+
+    final boolean clickable = ((viewFlags & CLICKABLE) == CLICKABLE
+            || (viewFlags & LONG_CLICKABLE) == LONG_CLICKABLE)
+            || (viewFlags & CONTEXT_CLICKABLE) == CONTEXT_CLICKABLE;
+    /**
+     *讲解一
+     */
+    //首先判断当前View是不是DISABLED不可用状态
+    if ((viewFlags & ENABLED_MASK) == DISABLED) {
+        if (action == MotionEvent.ACTION_UP && (mPrivateFlags & PFLAG_PRESSED) != 0) {
+            setPressed(false);
+        }
+        mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
+        //可点击的禁用视图仍然会消耗触摸事件，只是没有响应
+        //如果不可用 同时当前控件的clickable与long_clickable
+        //与CONTEXT_CLICKABLE全是false
+        //那么才返回false
+        return clickable;
+    }
+    //如果View有代理会执行这个方法
+    if (mTouchDelegate != null) {
+        if (mTouchDelegate.onTouchEvent(event)) {
+            return true;
+        }
+    }
+    
+   /**
+    *讲解二
+    */
+    //只要控件的clickable与long_clickable
+    //与CONTEXT_CLICKABLE 有一个为true 
+    // 或者此View可以在悬停或长按时显示工具提示，就进入
+    if (clickable || (viewFlags & TOOLTIP) == TOOLTIP) {
+        switch (action) {
+            case MotionEvent.ACTION_UP:
+                   ...
+                    if (!mHasPerformedLongPress && !mIgnoreNextUpEvent) {
+                        //移除长按监测
+                        removeLongPressCallback();
+
+                        // Only perform take click actions if we were in the pressed state
+                        if (!focusTaken) {
+                            // 当up事件发生时，会触发performClick方法
+                            if (mPerformClick == null) {
+                                mPerformClick = new PerformClick();
+                            }
+                            /**
+                             *讲解三
+                             */
+                            // 如果View设置OnClickListener，那么performClick就会调用View的onClick方法
+                            //发送到message到MessageQueue中，如果主线程还在运行中，就会返回true;
+                            if (!post(mPerformClick)) {
+                                performClickInternal();
+                            }
+                        }
+                    }
+
+                    ....
+                break;
+
+            case MotionEvent.ACTION_DOWN:
+                ...
+                //检查是否长按；最后会调用performLongClick()方法
+                if (!clickable) {
+                    checkForLongClick(0, x, y);
+                    break;
+                }
+                
+                ...
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+                //取消相关Callback，修改状态值；
+                if (clickable) {
+                    setPressed(false);
+                }
+                removeTapCallback();
+                removeLongPressCallback();
+                mInContextButtonPress = false;
+                mHasPerformedLongPress = false;
+                mIgnoreNextUpEvent = false;
+                mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (clickable) {
+                    drawableHotspotChanged(x, y);
+                }
+
+                 //不在按钮内滑动，取消相关Callback
+                if (!pointInView(x, y, mTouchSlop)) {
+                    // Outside button
+                    // Remove any future long press/tap checks
+                    removeTapCallback();
+                    removeLongPressCallback();
+                    if ((mPrivateFlags & PFLAG_PRESSED) != 0) {
+                        setPressed(false);
+                    }
+                    mPrivateFlags3 &= ~PFLAG3_FINGER_DOWN;
+                }
+                break;
+        }
+        /**
+         *讲解四
+         */
+        return true;
+    }
+
+    return false;
+}
+```
+
+PerformClick类
+
+```
+private final class PerformClick implements Runnable {
+    @Override
+    public void run() {
+        performClickInternal();
+    }
+}
+
+private boolean performClickInternal() {
+    // Must notify autofill manager before performing the click actions to avoid scenarios where
+    // the app has a click listener that changes the state of views the autofill service might
+    // be interested on.
+    notifyAutofillManagerOnClick();
+
+    return performClick();
+}
+
+public boolean performClick() {
+    
+    notifyAutofillManagerOnClick();
+
+    final boolean result;
+    final ListenerInfo li = mListenerInfo;
+    if (li != null && li.mOnClickListener != null) {
+        playSoundEffect(SoundEffectConstants.CLICK);
+        //调用onClick()方法；
+        li.mOnClickListener.onClick(this);
+        result = true;
+    } else {
+        result = false;
+    }
+
+    sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
+
+    notifyEnterOrExitForAutoFillIfNeeded(true);
+
+    return result;
+}
+```
+
+```
+private void checkForLongClick(int delayOffset, float x, float y) {
+    if ((mViewFlags & LONG_CLICKABLE) == LONG_CLICKABLE || (mViewFlags & TOOLTIP) == TOOLTIP) {
+        mHasPerformedLongPress = false;
+
+        if (mPendingCheckForLongPress == null) {
+            mPendingCheckForLongPress = new CheckForLongPress();
+        }
+        mPendingCheckForLongPress.setAnchor(x, y);
+        mPendingCheckForLongPress.rememberWindowAttachCount();
+        mPendingCheckForLongPress.rememberPressedState();
+        //ViewConfiguration.getLongPressTimeout()时间为500ms，所以当用户按下去500ms之后就会回OnLongClickListener.onLongClick方法；
+        //如果500ms之内手指弹起，会发生ACTION_UP事件，此时会移出长按监测，这样就不会发生长按事件
+        postDelayed(mPendingCheckForLongPress,
+                ViewConfiguration.getLongPressTimeout() - delayOffset);
+    }
+}
+```
+
+通过以上代码可以看出：
+
+* 当发生ACTION_DOWN的时候，开始长按监测，如果用户手指按下时间超过500ms才会发生长按事件，少于500ms就是onClick事件；可以得知，是否是长按事件是在Java层进行判断的，并且和ACTION_MOVE事件没有关系。
+* onLongClick方法返回true之后会将mHasPerformedLongPress属性置为true，在Up的时候就不会执行onClick，如果onlongClick返回false在Up事件到来时就会执行onClick
+* onClick是否会发生的前提是当前View是可点击的，并且它收到了Down和Up事件，
+* 只要View的CLICKABLE和LONG_CLICKABLE有一个为TRUE，那么该View就会消耗掉该事件，可以看出以上无论是Down、Move还是Up事件，最终都return true；
+
+* 讲解一
+
+由代码可知即使控件是DISABLED状态，只要clickable与longclickable有一个返回true那么此方法就返回true，即事件被消费。但是不会执行onClick()方法。这点通过代码很容易理解。
+
+* 讲解二
+
+讲解二中只要有一个条件满足。就会进入switch语句。当接收到MotionEvent.ACTION_UP时(前提MotionEvent.ACTION_DOWN也接收到了)会经过判断最后执行 performClick();方法。
+
+* 讲解三
+
+performClick()方法内部会执行我们设置的监听，即onClick()方法。
+
+* 讲解四
+
+由代码可知只要讲解二中的if语句成立，不管进入switch中的任何ACTION或是都不进入，返回值都是true，即事件消费了。同时讲解四也证明默认情况下是返回true
+
 ![image](pic/p351.png)
+
+总结：
+
+1. 整个View的事件分发流程：
+
+View.dispatchEvent->View.setOnTouchListener->View.onTouchEvent
+在dispatchTouchEvent中会进行OnTouchListener的判断，如果OnTouchListener不为null且返回true，则表示事件被消费，onTouchEvent不会被执行；否则执行onTouchEvent。
+
+2. onTouchEvent中的DOWN,MOVE,UP
+
+* DOWN时：
+
+a、首先设置标志为PREPRESSED，设置mHasPerformedLongPress=false ;然后发出一个115ms后的mPendingCheckForTap；
+b、如果115ms内没有触发UP，则将标志置为PRESSED，清除PREPRESSED标志，同时发出一个延时为500-115ms的，检测长按任务消息；
+c、如果500ms内（从DOWN触发开始算），则会触发LongClickListener:
+
+此时如果LongClickListener不为null，则会执行回调，同时如果LongClickListener.onClick返回true，才把mHasPerformedLongPress设置为true;否则mHasPerformedLongPress依然为false;
+
+* MOVE时：
+
+主要就是检测用户是否划出控件，如果划出了：
+
+115ms内，直接移除mPendingCheckForTap；
+115ms后，则将标志中的PRESSED去除，同时移除长按的检查：removeLongPressCallback();
+
+* UP时：
+
+a、如果115ms内，触发UP，此时标志为PREPRESSED，则执行UnsetPressedState，setPressed(false);会把setPress转发下去，可以在View中复写dispatchSetPressed方法接收；
+b、如果是115ms-500ms间，即长按还未发生，则首先移除长按检测，执行onClick回调；
+c、如果是500ms以后，那么有两种情况：
+i.设置了onLongClickListener，且onLongClickListener.onClick返回true，则点击事件OnClick事件无法触发；
+ii.没有设置onLongClickListener或者onLongClickListener.onClick返回false，则点击事件OnClick事件依然可以触发；
+d、最后执行setPressed刷新背景，然后将PRESSED标识去除；
+
+![image](pic/p423.png)
 
 ## Android View 绘制流程 & 自定义View
 
