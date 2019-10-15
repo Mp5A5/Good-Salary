@@ -7035,7 +7035,7 @@ private boolean promoteAndExecute() {
     eventListener.callStart(this);
     client.dispatcher().enqueue(new AsyncCall(responseCallback));
 }
-````
+```
 
 * 方法接收一个Callback参数，它是用来进行请求结束回调的
 * 有一个同步代码块，判断该请求是否已经执行过；可以看出来，同一个Call对象，不管是调用execute方法还是enqueue方法，都只能调用一次
@@ -9502,7 +9502,7 @@ DiskLruCache这个东西大家应该很熟悉了吧，我们通常做三级缓�
         || method.equals("DELETE")
         || method.equals("MOVE");     // WebDAV
   }
-````
+```
 
 如果是以上这些请求方法，那么获取到的响应将不会进行缓存
 
@@ -10761,7 +10761,7 @@ DataFetcher 也是个接口，其中最重要的一个方法就是 loadData，�
 
 内部实现就是通过 HttpUrlConnect 发起网络请求，或者打开一个文件，或者使用 AssetManager 打开一个资源等等。。。
 
-加载完成后通过 DataFetcher$DataCallback 接口回调。
+加载完成后通过 ```DataFetcher$DataCallback``` 接口回调。
 
 DataCallback 中包含两个方法：
 

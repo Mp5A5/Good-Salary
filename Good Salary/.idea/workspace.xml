@@ -2,19 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest01.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/BubbleSortTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/BubbleSortTest01.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/MergeSortTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/QuickSortTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/QuickSortTest01.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/ShellSortTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Android.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Test.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithm/sort/MergeSort.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/sort/MergeSort.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../~$我的总结笔记.docx" beforeDir="false" afterPath="$PROJECT_DIR$/../~$我的总结笔记.docx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -314,6 +306,7 @@
       <workItem from="1570251031948" duration="926000" />
       <workItem from="1570414459546" duration="50000" />
       <workItem from="1570414560312" duration="7303000" />
+      <workItem from="1571046323690" duration="6033000" />
     </task>
     <servers />
   </component>
