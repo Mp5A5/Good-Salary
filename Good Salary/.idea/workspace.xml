@@ -2,10 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest01.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/tree/TreeDemo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/tree/TreeNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android_Salary.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android_Salary.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSort.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSort.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSortTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSortTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_01.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_01.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Appel.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Appel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Food.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Food.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Fruit.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Fruit.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recover/Java_01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/recover/Java_01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recover/Java_07_01_Type.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/recover/Java_07_01_Type.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Java基础知识.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java基础知识.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../~$我的总结笔记.docx" beforeDir="false" afterPath="$PROJECT_DIR$/../~$我的总结笔记.docx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -105,34 +116,20 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.MergeSortTest">
+  <component name="RunManager" selected="JUnit.SortTest01.test">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Dispatch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="jvm.Dispatch" />
+    <configuration name="Java_01" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="recover.Java_01" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="jvm.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DynamicDispatch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="jvm.DynamicDispatch" />
-      <module name="Good Salary" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="jvm.*" />
+          <option name="PATTERN" value="recover.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -182,6 +179,23 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="SortTest01.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithm.sort.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="algorithm.sort" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortTest01" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -209,11 +223,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.SortTest01.test" />
+        <item itemvalue="Application.Java_01" />
         <item itemvalue="Application.MergeSortTest" />
         <item itemvalue="Application.Test" />
         <item itemvalue="Application.Tester" />
-        <item itemvalue="Application.Dispatch" />
-        <item itemvalue="Application.DynamicDispatch" />
       </list>
     </recent_temporary>
   </component>
@@ -306,7 +320,7 @@
       <workItem from="1570251031948" duration="926000" />
       <workItem from="1570414459546" duration="50000" />
       <workItem from="1570414560312" duration="7303000" />
-      <workItem from="1571046323690" duration="6033000" />
+      <workItem from="1571046323690" duration="11514000" />
     </task>
     <servers />
   </component>

@@ -640,8 +640,6 @@ public static int digit(int codePoint, int radix) {
 * 通过*= 和-= 进行计算拼接
 * 判断是否为负值 返回结果。
 
-
-
 ## 探探对java多态的理解
 
 #### 面向对象编程有三大特性：封装、继承、多态。
