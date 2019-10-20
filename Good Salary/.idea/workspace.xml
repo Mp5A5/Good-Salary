@@ -1,24 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest01.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/tree/TreeDemo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/tree/TreeNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android_Salary.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android_Salary.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSort.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSort.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSortTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/algorithm/sort/MergeSortTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_01.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_01.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Appel.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Appel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Food.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Food.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Fruit.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type$Fruit.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_07_01_Type.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/recover/Java_01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/recover/Java_01.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/recover/Java_07_01_Type.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/recover/Java_07_01_Type.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Java基础知识.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java基础知识.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../~$我的总结笔记.docx" beforeDir="false" afterPath="$PROJECT_DIR$/../~$我的总结笔记.docx" afterDir="false" />
-    </list>
+    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -320,7 +303,7 @@
       <workItem from="1570251031948" duration="926000" />
       <workItem from="1570414459546" duration="50000" />
       <workItem from="1570414560312" duration="7303000" />
-      <workItem from="1571046323690" duration="11514000" />
+      <workItem from="1571046323690" duration="11892000" />
     </task>
     <servers />
   </component>

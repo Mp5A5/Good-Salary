@@ -4473,4 +4473,404 @@ Client向SM发送申请服务Server的请求，那么SM就可以在查找表中�
 
 ![image](pic/p327.png)
 
+## AsyncTask的原理及其源码
+
+### 原理
+
+AsyncTask的实现原理 = 线程池 + Handler
+
+> 其中：线程池用于线程调度、复用 & 执行任务；Handler 用于异步通信
+
+其内部封装了2个线程池 + 1个Handler，具体介绍如下：
+
+![image](pic/p451.png)
+
+### 源码
+
+#### 类和方法
+
+一、类
+
+AsyncTask类属于抽象类，即使用时需子类实现
+
+```
+// 类中参数为3种泛型类型
+// 整体作用：控制AsyncTask子类执行线程任务时各个阶段的返回类型
+// 具体说明：
+  // a. Params：开始异步任务执行时传入的参数类型，对应excute（）中传递的参数
+  // b. Progress：异步任务执行过程中，返回下载进度值的类型
+  // c. Result：异步任务执行完成后，返回的结果类型，与doInBackground()的返回值类型保持一致
+// 注：
+  // a. 使用时并不是所有类型都被使用
+  // b. 若无被使用，可用java.lang.Void类型代替
+  // c. 若有不同业务，需额外再写1个AsyncTask的子类
+}
+public abstract class AsyncTask<Params, Progress, Result> { 
+ ... 
+}
+```
+
+二、方法
+
+![image](pic/p452.png)
+
+方法执行顺序如下
+
+![image](pic/p453.png)
+
+三、源码
+
+1、构造方法
+
+```
+public AsyncTask(@Nullable Looper callbackLooper) {
+    // 根据传入的looper判断是使用自己的InternalHandler还是重新实例化Handler
+    // 1 如果传入的looper为null或者传入的looper是主线程looper对象，使用自己的InternalHandler
+    // 否则初始化一个Handler
+    mHandler = callbackLooper == null || callbackLooper == Looper.getMainLooper()
+        ? getMainHandler()
+        : new Handler(callbackLooper);
+    // 1. 初始化WorkerRunnable变量 = 一个可存储参数的Callable对象 ->>分析1
+    mWorker = new WorkerRunnable<Params, Result>() {
+        // 在任务执行线程池中回调：THREAD_POOL_EXECUTOR.execute（）
+        public Result call() throws Exception {
+            // 添加线程的调用标识
+            mTaskInvoked.set(true);
+            Result result = null;
+            try {
+                // 设置线程的优先级
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                // 执行异步操作 = 耗时操作
+                // 即 我们使用过程中复写的耗时任务
+                result = doInBackground(mParams);
+                Binder.flushPendingCommands();
+            } catch (Throwable tr) {
+                // 若运行异常,设置取消的标志
+                mCancelled.set(true);
+                throw tr;
+            } finally {
+                // 把异步操作执行的结果发送到主线程
+                // 从而更新UI
+                postResult(result);
+            }
+            return result;
+        }
+    };
+    // 2. 初始化FutureTask变量 = 1个FutureTask ->>分析2
+    mFuture = new FutureTask<Result>(mWorker) {
+        // done（）简介：FutureTask内的Callable执行完后的调用方法
+        // 作用：复查任务的调用、将未被调用的任务的结果通过InternalHandler传递到UI线程
+        @Override
+        protected void done() {
+            try {
+                // 在执行完任务后检查,将没被调用的Result也一并发出 ->>分析3
+                postResultIfNotInvoked(get());
+            } 
+            ...
+             catch (CancellationException e) {
+                //若 发生异常,则将发出nul
+                postResultIfNotInvoked(null);
+            }
+        }
+    };
+}
+
+/**
+  * 分析1：WorkerRunnable类的构造函数
+  */
+private static abstract class WorkerRunnable<Params, Result> implements Callable<Result> {
+    // 此处的Callable也是任务；
+    // 与Runnable的区别：Callable<T>存在返回值 = 其泛型
+    Params[] mParams;
+}
+
+/**
+  * 分析2：FutureTask类的构造函数
+  * 定义：1个包装任务的包装类
+  * 注：内部包含Callable<T> 、增加了一些状态标识 & 操作Callable<T>的接口
+  */
+public FutureTask(Callable<V> callable) {
+    if (callable == null)
+        throw new NullPointerException();
+    this.callable = callable;
+    this.state = NEW;      
+}
+// 回到调用原处
+
+/**
+  * 分析3：postResultIfNotInvoked()
+  */
+private void postResultIfNotInvoked()(Result result) {
+    // 取得任务标记
+    final boolean wasTaskInvoked = mTaskInvoked.get();
+
+    // 若任务无被执行,将未被调用的任务的结果通过InternalHandler传递到UI线程
+    if (!wasTaskInvoked) {
+        postResult(result);
+    }
+}
+```
+
+总结：
+
+* 创建了1个WorkerRunnable类的实例对象 & 复写了call()方法
+* 创建了1个FutureTask类 的实例对象 & 复写了 done()
+
+2、手动调用execute(Params... params)
+
+```
+@MainThread
+public final AsyncTask<Params, Progress, Result> execute(Params... params) {
+    // ->>分析1
+    // sDefaultExecutor就是SerialExecutor
+    return executeOnExecutor(sDefaultExecutor, params);
+}
+
+/**
+  * 分析1：executeOnExecutor(sDefaultExecutor, params)
+  * 参数说明：sDefaultExecutor = 任务队列 线程池类（SerialExecutor）的对象
+  */
+@MainThread
+public final AsyncTask<Params, Progress, Result> executeOnExecutor(Executor exec,
+        Params... params) {
+    // 1. 判断 AsyncTask 当前的执行状态
+    // PENDING = 初始化状态    
+    ...
+    // 2. 将AsyncTask状态设置为RUNNING状态
+    mStatus = Status.RUNNING;
+    // 3. 主线程初始化工作
+    onPreExecute();
+    // 4. 添加参数到任务中
+    mWorker.mParams = params;
+    // 5. 执行任务
+    // 此处的exec = sDefaultExecutor = 任务队列 线程池类（SerialExecutor）的对象
+    // ->>分析2
+    exec.execute(mFuture);
+
+    return this;
+}
+
+/**
+  * 分析2：exec.execute(mFuture)
+  * 说明：属于任务队列 线程池类（SerialExecutor）的方法
+  */
+private static class SerialExecutor implements Executor {
+    // SerialExecutor = 静态内部类
+    // 即 是所有实例化的AsyncTask对象公有的
+
+    // SerialExecutor 内部维持了1个双向队列；
+    // 容量根据元素数量调节
+    final ArrayDeque<Runnable> mTasks = new ArrayDeque<Runnable>();
+    Runnable mActive;
+
+    // execute（）被同步锁synchronized修饰
+    // 即说明：通过锁使得该队列保证AsyncTask中的任务是串行执行的
+    // 即 多个任务需1个个加到该队列中；然后 执行完队列头部的再执行下一个，以此类推
+    public synchronized void execute(final Runnable r) {
+        // 将实例化后的FutureTask类 的实例对象传入
+        // 即相当于：向队列中加入一个新的任务
+        mTasks.offer(new Runnable() {
+            public void run() {
+                try {
+                    r.run();
+                } finally {
+                    scheduleNext();->>分析3
+                }
+            }
+        });
+        // 若当前无任务执行，则去队列中取出1个执行
+        if (mActive == null) {
+            scheduleNext();
+        }
+    }
+    // 分析3
+    protected synchronized void scheduleNext() {
+        // 1. 取出队列头部任务
+        if ((mActive = mTasks.poll()) != null) {
+
+            // 2. 执行取出的队列头部任务
+            // 即 调用执行任务线程池类（THREAD_POOL_EXECUTOR）->>继续往下看
+            THREAD_POOL_EXECUTOR.execute(mActive);
+            
+        }
+    }
+}
+```
+
+总结：
+
+* 执行任务前，通过任务队列 线程池类（SerialExecutor）将任务按顺序放入到队列中；
+ * 通过同步锁 修饰execute（）从而保证AsyncTask中的任务是串行执行的
+* 之后的线程任务执行是 通过任务线程池类（```THREAD_POOL_EXECUTOR```） 进行的。
+
+
+```THREAD_POOL_EXECUTOR.execute（）```
+
+```
+/**
+  * 源码分析：THREAD_POOL_EXECUTOR.execute（）
+  * 说明：
+  *     a. THREAD_POOL_EXECUTOR实际上是1个已配置好的可执行并行任务的线程池
+  *     b. 调用THREAD_POOL_EXECUTOR.execute（）实际上是调用线程池的execute()去执行具体耗时任务
+  *     c. 而该耗时任务则是步骤2中初始化WorkerRunnable实例对象时复写的call（）
+  * 注：下面先看任务执行线程池的线程配置过程，看完后请回到步骤2中的源码分析call（）
+  */
+
+// 步骤1：参数设置
+    //获得当前CPU的核心数
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    //设置线程池的核心线程数2-4之间,但是取决于CPU核数
+    private static final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 4));
+    //设置线程池的最大线程数为 CPU核数*2+1
+    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
+    //设置线程池空闲线程存活时间30s
+    private static final int KEEP_ALIVE_SECONDS = 30;
+
+    //初始化线程工厂
+    private static final ThreadFactory sThreadFactory = new ThreadFactory() {
+        private final AtomicInteger mCount = new AtomicInteger(1);
+
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
+        }
+    };
+
+    //初始化存储任务的队列为LinkedBlockingQueue 最大容量为128
+    private static final BlockingQueue<Runnable> sPoolWorkQueue =
+            new LinkedBlockingQueue<Runnable>(128);
+
+// 步骤2： 根据参数配置执行任务线程池，即 THREAD_POOL_EXECUTOR
+public static final Executor THREAD_POOL_EXECUTOR;
+
+static {
+    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,
+            sPoolWorkQueue, sThreadFactory);
+    // 设置核心线程池的 超时时间也为30s
+    threadPoolExecutor.allowCoreThreadTimeOut(true);
+    THREAD_POOL_EXECUTOR = threadPoolExecutor;
+}
+
+// 请回到构造方法中的源码分析call（）
+
+/**
+* 步骤2的源码分析：AsyncTask的构造函数
+*/
+public AsyncTask() {
+    // 1. 初始化WorkerRunnable变量 = 一个可存储参数的Callable对象
+    mWorker = new WorkerRunnable<Params, Result>() {
+
+        public Result call() throws Exception {
+
+            // 添加线程的调用标识
+            mTaskInvoked.set(true); 
+
+            Result result = null;
+            try {
+                // 设置线程的优先级
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                
+                // 执行异步操作 = 耗时操作
+                // 即 我们使用过程中复写的耗时任务
+                result = doInBackground(mParams);
+
+                Binder.flushPendingCommands();
+            } catch (Throwable tr) {
+                
+                mCancelled.set(true);// 若运行异常,设置取消的标志
+                throw tr;
+            } finally {
+                
+                // 把异步操作执行的结果发送到主线程
+                // 从而更新UI ->>分析1
+                postResult(result); 
+            }
+            return result;
+        }
+    };
+
+    .....// 省略
+}
+/**
+* 分析1：postResult(result)
+*/
+private Result postResult(Result result) {
+
+    @SuppressWarnings("unchecked")
+
+    // 创建Handler对象 ->> 源自InternalHandler类—>>分析2
+    Message message = getHandler().obtainMessage(MESSAGE_POST_RESULT,
+            new AsyncTaskResult<Result>(this, result));
+    // 发送消息到Handler中
+    message.sendToTarget();
+    return result;
+
+}
+
+
+/**
+* 分析2：InternalHandler类
+*/
+private static class InternalHandler extends Handler {
+
+    // 构造函数
+    public InternalHandler() {
+        super(Looper.getMainLooper());
+        // 获取的是主线程的Looper()
+        // 故 AsyncTask的实例创建 & execute（）必须在主线程使用
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+
+        AsyncTaskResult<?> result = (AsyncTaskResult<?>) msg.obj;
+
+        switch (msg.what) {
+            // 若收到的消息 = MESSAGE_POST_RESULT
+            // 则通过finish() 将结果通过Handler传递到主线程
+            case MESSAGE_POST_RESULT:
+                result.mTask.finish(result.mData[0]); ->>分析3
+                break;
+
+            // 若收到的消息 = MESSAGE_POST_PROGRESS
+            // 则回调onProgressUpdate()通知主线程更新进度的操作
+            case MESSAGE_POST_PROGRESS:
+                result.mTask.onProgressUpdate(result.mData);
+                break;
+        }
+    }
+}
+/**
+* 分析3：result.mTask.finish(result.mData[0])
+*/
+private void finish(Result result) {
+    // 先判断是否调用了Cancelled()
+        // 1. 若调用了则执行我们复写的onCancelled（）
+        // 即 取消任务时的操作
+        if (isCancelled()) {
+            onCancelled(result);
+        } else {
+
+        // 2. 若无调用Cancelled()，则执行我们复写的onPostExecute(result)
+        // 即更新UI操作
+            onPostExecute(result);
+        }
+        // 注：不管AsyncTask是否被取消，都会将AsyncTask的状态变更为：FINISHED
+        mStatus = Status.FINISHED;
+    }
+```
+
+总结
+
+1. 任务线程池类（THREAD_POOL_EXECUTOR）实际上是1个已配置好的可执行并行任务的线程池
+2. 调用THREAD_POOL_EXECUTOR.execute（）实际上是调用线程池的execute()去执行具体耗时任务
+3. 该耗时任务则是构造方法中初始化的 WorkerRunnable实例对象时复写的call（）内容
+4. 在call（）方法里，先调用 我们复写的doInBackground(mParams)执行耗时操作
+5. 再调用postResult(result)， 通过 InternalHandler 类 将任务消息传递到主线程；根据消息标识（MESSAGE_POST_RESULT）判断，最终通过finish(）调用我们复写的onPostExecute(result)，从而实现UI更新操作
+
+#### 源码总结
+
+![image](pic/454.png)
+
+
 
