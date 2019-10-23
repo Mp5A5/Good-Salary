@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/algorithm/IStack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/MyStack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/TestStack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest02.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortDemo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试SDK源码篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试SDK源码篇.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试优化篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试优化篇.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试基础.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试基础.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试框架篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试框架篇.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试热修复.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试热修复.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试网络篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试网络篇.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Java面试基础&amp;高级篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试基础&amp;高级篇.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pic/p426.gig.gif" beforeDir="false" />
-    </list>
+    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -336,6 +320,7 @@
       <workItem from="1570414560312" duration="7303000" />
       <workItem from="1571046323690" duration="11892000" />
       <workItem from="1571644638911" duration="9860000" />
+      <workItem from="1571827460412" duration="199000" />
     </task>
     <servers />
   </component>
