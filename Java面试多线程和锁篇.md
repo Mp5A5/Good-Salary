@@ -1519,7 +1519,7 @@ public static synchronized void print();
     8: return	
 ```
 
-可以看到方法表的访问标志位 (flags) 中多了个 ACC_SYNCHRONIZED，然后看字节码指令区域 (Code) ，和普通方法没任何差别, 猜测 Java 虚拟机通过检查方法表中是否存在标志位 ACC_SYNCHRONIZED 来决定是否需要获取锁。
+可以看到方法表的访问标志位 (flags) 中多了个 ```ACC_SYNCHRONIZED```，然后看字节码指令区域 (Code) ，和普通方法没任何差别, 猜测 Java 虚拟机通过检查方法表中是否存在标志位 ```ACC_SYNCHRONIZED ```来决定是否需要获取锁。
 
 然后看第二个使用 synchronized 区块的方法（Lock.print2）字节码：
 
@@ -1712,7 +1712,7 @@ void Parker::park(bool isAbsolute, jlong time) {
 }
 ```
 
-总共分三步走，先获取锁，再调用 pthread_cond_wait 阻塞线程，最后阻塞恢复了之后释放锁，是不是和我们使用 Object.wait 十分类似，事实上 Object.wait 底层也是这种方式实现的。为了更清楚的了解底层的实现，写了一段 c 代码看一下线程的创建和锁的使用：
+总共分三步走，先获取锁，再调用 ```pthread_cond_wait``` 阻塞线程，最后阻塞恢复了之后释放锁，是不是和我们使用 Object.wait 十分类似，事实上 Object.wait 底层也是这种方式实现的。为了更清楚的了解底层的实现，写了一段 c 代码看一下线程的创建和锁的使用：
 
 ```
 int counter = 0;
@@ -1741,7 +1741,7 @@ int main() {
 }
 ```
 
-使用 pthread_create 创建线程，使用 pthread_mutex_lock 获取锁，使用 pthread_mutex_unlock 释放锁。那既然 pthread_mutex_lock 和 pthread_mutex_unlock 就能实现锁了，那为什么锁实现的时候还要使用 pthread_cond_wait 来阻塞线程呢？回过头看 PlatformParker ：
+使用 ```pthread_create``` 创建线程，使用 ```pthread_mutex_lock``` 获取锁，使用 ```pthread_mutex_unlock``` 释放锁。那既然 ```pthread_mutex_lock``` 和 ```pthread_mutex_unlock``` 就能实现锁了，那为什么锁实现的时候还要使用 ```pthread_cond_wait```来阻塞线程呢？回过头看 PlatformParker ：
 
 ```
 //os_linux.hpp
@@ -1754,7 +1754,7 @@ class PlatformParker {
 ```
 
 每个 JavaThread 实例都有自己的 mutex，在上述自己写的例子中是多个线程竞争同一个 mutex，阻塞线程队列管理的逻辑直接由 mutex 实现，而此处的 mutex 线程私有，不存在直接竞争关系，事实上，JVM 为了提升平台通用性(?)，只提供了线程阻塞和恢复操作，阻塞线程队列的管理工作交给了 Java 层，也就是前面提到的 AQS。对于 Java 层来说 JVM 只需要提供 「阻塞」 和 「唤醒」 的操作即可。
-在 Java 中讲解 Object.wait, Object.notify 的时候通常会用生产者-消费者作为例子，这里我也简单的写了一个 c 的例子，让大家了解底层线程阻塞的原理：
+在 Java 中讲解 ```Object.wait, Object.notify``` 的时候通常会用生产者-消费者作为例子，这里我也简单的写了一个 c 的例子，让大家了解底层线程阻塞的原理：
 
 ```
 #define TRUE 1
@@ -1820,9 +1820,9 @@ int main(int argc, char const *argv[]) {
 }
 ```
 
-其中消费者线程是一个循环，在循环中先获取锁，然后判断队列是否为空，如果为空则调用 pthread_cond_wait 阻塞线程，这个阻塞操作会自动释放持有的锁并出让 cpu 时间片，恢复的时候自动获取锁，消费完队列之后会调用 pthread_cond_signal 通知生产者线程，另外还有一个通知所有线程恢复的 pthread_cond_broadcast，与 notifyAll 类似。
+其中消费者线程是一个循环，在循环中先获取锁，然后判断队列是否为空，如果为空则调用 ```pthread_cond_wait``` 阻塞线程，这个阻塞操作会自动释放持有的锁并出让 cpu 时间片，恢复的时候自动获取锁，消费完队列之后会调用 ```pthread_cond_signal``` 通知生产者线程，另外还有一个通知所有线程恢复的 ```pthread_cond_broadcast```，与 notifyAll 类似。
 
-最后再简单谈一下阻塞中断，Java 层 Thread 中有个 interrupt 方法，它的作用是在线程收到阻塞的时候抛出一个中断信号，这样线程就会退出阻塞状态，但是并不是我们遇到的所有阻塞都会中断，要看是否会响应中断信号，Object.wait, Thread.join，Thread.sleep，ReentrantLock.lockInterruptibly 这些会抛出受检异常 InterruptedException 的都会被中断。synchronized，ReentrantLock.lock 的锁竞争阻塞是不会被中断的，interrupt 并不会强制终止线程，而是会将线程设置成 interrupted 状态，我们可以通过判断 isInterrupted 或 interrupted 来获取中断状态，区别在于后者会重置中断状态为 false。看一下底层线程中断的代码：
+最后再简单谈一下阻塞中断，Java 层 Thread 中有个 interrupt 方法，它的作用是在线程收到阻塞的时候抛出一个中断信号，这样线程就会退出阻塞状态，但是并不是我们遇到的所有阻塞都会中断，要看是否会响应中断信号，```Object.wait, Thread.join，Thread.sleep，ReentrantLock.lockInterruptibly``` 这些会抛出受检异常 InterruptedException 的都会被中断。synchronized，ReentrantLock.lock 的锁竞争阻塞是不会被中断的，interrupt 并不会强制终止线程，而是会将线程设置成 interrupted 状态，我们可以通过判断 isInterrupted 或 interrupted 来获取中断状态，区别在于后者会重置中断状态为 false。看一下底层线程中断的代码：
 
 ```
 // os_linux.cpp
@@ -1842,7 +1842,7 @@ void os::interrupt(Thread* thread) {
 }
 ```
 
-可以看到，线程中断也是由 unpark 实现的, 即恢复了阻塞的线程。并且对之前提到的三个 Parker (_ParkEvent，_SleepEvent，_parker) 都进行了 unpark。
+可以看到，线程中断也是由 unpark 实现的, 即恢复了阻塞的线程。并且对之前提到的三个 ```Parker (_ParkEvent，_SleepEvent，_parker)``` 都进行了 unpark。
 
 ### AQS原理
 
@@ -2207,7 +2207,7 @@ public class SyncTest {
 }
 ```
 
-从上面的中文注释处可以看到，对于synchronized关键字而言，javac在编译时，会生成对应的monitorenter和monitorexit指令分别对应synchronized同步块的进入和退出，有两个monitorexit指令的原因是：为了保证抛异常的情况下也能释放锁，所以javac为同步代码块添加了一个隐式的try-finally，在finally中会调用monitorexit命令释放锁。而对于synchronized方法而言，javac为其生成了一个ACC_SYNCHRONIZED关键字，在JVM进行方法调用时，发现调用的方法被ACC_SYNCHRONIZED修饰，则会先尝试获得锁。
+从上面的中文注释处可以看到，对于synchronized关键字而言，javac在编译时，会生成对应的monitorenter和monitorexit指令分别对应synchronized同步块的进入和退出，有两个monitorexit指令的原因是：为了保证抛异常的情况下也能释放锁，所以javac为同步代码块添加了一个隐式的try-finally，在finally中会调用monitorexit命令释放锁。而对于synchronized方法而言，javac为其生成了一个```ACC_SYNCHRONIZED```关键字，在JVM进行方法调用时，发现调用的方法被```ACC_SYNCHRONIZED```修饰，则会先尝试获得锁。
 
 在JVM底层，对于这两种synchronized语义的实现大致相同，在后文中会选择一种进行详细分析。
 

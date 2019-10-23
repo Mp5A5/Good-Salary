@@ -33,6 +33,7 @@
 类加载方案基于Dex分包方案，什么是Dex分包方案呢？这个得先从65536限制和LinearAlloc限制说起。
 
 **65536限制**
+
 随着应用功能越来越复杂，代码量不断地增大，引入的库也越来越多，可能会在编译时提示如下异常：
 
 ```
@@ -42,7 +43,8 @@ com.android.dex.DexIndexOverflowException: method ID not in [0, 0xffff]: 65536
 这说明应用中引用的方法数超过了最大数65536个。产生这一问题的原因就是系统的65536限制，65536限制的主要原因是DVM Bytecode的限制，DVM指令集的方法调用指令invoke-kind索引为16bits，最多能引用 65535个方法。
 
 **LinearAlloc限制**
-在安装时可能会提示INSTALL_FAILED_DEXOPT。产生的原因就是LinearAlloc限制，DVM中的LinearAlloc是一个固定的缓存区，当方法数过多超出了缓存区的大小时会报错。
+
+在安装时可能会提示```INSTALL_FAILED_DEXOPT```。产生的原因就是LinearAlloc限制，DVM中的LinearAlloc是一个固定的缓存区，当方法数过多超出了缓存区的大小时会报错。
 
 为了解决65536限制和LinearAlloc限制，从而产生了Dex分包方案。Dex分包方案主要做的是在打包时将应用代码分成多个Dex，将应用启动时必须用到的类和这些类的直接引用类放到主Dex中，其他代码放到次Dex中。当应用启动时先加载主Dex，等到应用启动后再动态的加载次Dex，从而缓解了主Dex的65536限制和LinearAlloc限制。
 
@@ -171,7 +173,7 @@ class ArtMethod FINAL {
 }
 ```
 
-ArtMethod结构中比较重要的字段是注释1处的dex_cache_resolved_methods和注释2处的entry_point_from_quick_compiledcode，它们是方法的执行入口，当我们调用某一个方法时（比如Key的show方法），就会取得show方法的执行入口，通过执行入口就可以跳过去执行show方法。
+ArtMethod结构中比较重要的字段是注释1处的```dex_cache_resolved_methods```和注释2处的```entry_point_from_quick_compiledcode```，它们是方法的执行入口，当我们调用某一个方法时（比如Key的show方法），就会取得show方法的执行入口，通过执行入口就可以跳过去执行show方法。
 替换ArtMethod结构体中的字段或者替换整个ArtMethod结构体，这就是底层替换方案。
 AndFix采用的是替换ArtMethod结构体中的字段，这样会有兼容问题，因为厂商可能会修改ArtMethod结构体，导致方法替换失败。Sophix采用的是替换整个ArtMethod结构体，这样不会存在兼容问题。
 底层替换方案直接替换了方法，可以立即生效不需要重启。采用底层替换方案主要是阿里系为主，包括AndFix、Dexposed、阿里百川、Sophix。

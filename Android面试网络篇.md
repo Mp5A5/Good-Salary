@@ -92,9 +92,9 @@ HTTP协议的信息传输完全以明文方式，不做任何加密，相当于�
 
 * 客户端发送 client_hello，包含一个随机数 random1。 
 * 服务端回复 server_hello，包含一个随机数 random2，携带了证书公钥 P。 
-* 客户端接收到 random2 之后就能够生成 premaster_secrect （对称加密的密钥）以及 master_secrect（用premaster_secret加密后的数据）。 
-* 客户端使用证书公钥 P 将 premaster_secrect 加密后发送给服务器 (用公钥P对premaster_secret加密)。 
-* 服务端使用私钥解密得到 premaster_secrect。又由于服务端之前就收到了随机数 1，所以服务端根据相同的生成算法，在相同的输入参数下，求出了相同的 master secrect。
+* 客户端接收到 random2 之后就能够生成 ```premaster_secrect``` （对称加密的密钥）以及 ```master_secrect```（用```premaster_secret```加密后的数据）。 
+* 客户端使用证书公钥 P 将 ```premaster_secrect``` 加密后发送给服务器 (用公钥P对```premaster_secret```加密)。 
+* 服务端使用私钥解密得到 ```premaster_secrect```。又由于服务端之前就收到了随机数 1，所以服务端根据相同的生成算法，在相同的输入参数下，求出了相同的 ```master secrect```。
 
 ![image](pic/p417.png)
 

@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="" />
+    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/algorithm/IStack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/MyStack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/TestStack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest02.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortDemo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试SDK源码篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试SDK源码篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试优化篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试优化篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试基础.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试基础.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试框架篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试框架篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试热修复.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试热修复.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试网络篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试网络篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Java面试基础&amp;高级篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试基础&amp;高级篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pic/p426.gig.gif" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,56 +115,20 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.SortTest01.test">
+  <component name="RunManager" selected="JUnit.SortDemo.test">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Java_01" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="recover.Java_01" />
+    <configuration name="TestStack" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="algorithm.TestStack" />
       <module name="Good Salary" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="recover.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MergeSortTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="algorithm.sort.MergeSortTest" />
-      <module name="Good Salary" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="algorithm.sort.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Test" />
-      <module name="Good Salary" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Tester" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="jvm.dynamic.Tester" />
-      <module name="Good Salary" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="jvm.dynamic.*" />
+          <option name="PATTERN" value="algorithm.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -158,6 +138,23 @@
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SortDemo.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithm.sort.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="algorithm.sort" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortDemo" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -172,6 +169,40 @@
       </extension>
       <option name="PACKAGE_NAME" value="algorithm.sort" />
       <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortTest01" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestStack.isStack" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithm.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="algorithm" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.TestStack" />
+      <option name="METHOD_NAME" value="isStack" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestStack.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithm.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="algorithm" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.TestStack" />
       <option name="METHOD_NAME" value="test" />
       <option name="TEST_OBJECT" value="method" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -206,11 +237,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.SortDemo.test" />
+        <item itemvalue="JUnit.TestStack.test" />
+        <item itemvalue="Application.TestStack" />
+        <item itemvalue="JUnit.TestStack.isStack" />
         <item itemvalue="JUnit.SortTest01.test" />
-        <item itemvalue="Application.Java_01" />
-        <item itemvalue="Application.MergeSortTest" />
-        <item itemvalue="Application.Test" />
-        <item itemvalue="Application.Tester" />
       </list>
     </recent_temporary>
   </component>
@@ -304,6 +335,7 @@
       <workItem from="1570414459546" duration="50000" />
       <workItem from="1570414560312" duration="7303000" />
       <workItem from="1571046323690" duration="11892000" />
+      <workItem from="1571644638911" duration="9860000" />
     </task>
     <servers />
   </component>
@@ -355,11 +387,6 @@
           <url>jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home/src.zip!/java/util/ArrayList.java</url>
           <line>724</line>
           <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_112.jdk/Contents/Home/src.zip!/java/lang/ThreadLocal.java</url>
-          <line>200</line>
-          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -93,7 +93,7 @@ drawable-xxhdpi (dpi=480, density=3)
 * 含义：density-independent pixel，叫dp或dip，与终端上的实际物理像素点无关
 * 单位：dp，可以保证在不同屏幕像素密度的设备上显示相同的效果，是安卓特有的长度单位。
 * 场景例子：假如同样都是画一条长度是屏幕一半的线，如果使用px作为计量单位，那么在480x800分辨率手机上设置应为240px；在320x480的手机上应设置为160px，二者设置就不同了；如果使用dp为单位，在这两种分辨率下，160dp都显示为屏幕一半的长度。
-* dp与px的转换：1dp = （dpi / 160 ） * 1px;
+* dp与px的转换：px = （dpi / 160 ） * dp;
 
 ![image](pic/p301.png)
 
@@ -166,11 +166,11 @@ public float scaledDensity;
 * RelativeLayout的子View如果高度和RelativeLayout不同，则会引发效率问题，当子View很复杂时，这个问题会更加严重。如果可以，尽量使用padding代替margin。
 * 在不影响层级深度的情况下,使用LinearLayout和FrameLayout而不是RelativeLayout。
 最后再思考一下一个矛盾问题，为什么Google给开发者默认新建了个RelativeLayout，而自己却在DecorView自己是FrameLayout但是它只有一个子元素是属于LinearLayout。因为DecorView的层级深度是已知而且固定的，上面一个标题栏，下面一个内容栏。采用RelativeLayout并不会降低层级深度，所以此时在根节点上用LinearLayout是效率最高的。而之所以给开发者默认新建了个RelativeLayout是希望开发者能采用尽量少的View层级来表达布局以实现性能最优，因为复杂的View嵌套对性能的影响会更大一些。
-* 能用两层LinearLayout，尽量用一个RelativeLayout，在时间上此时RelativeLayout耗时更小。另外LinearLayout慎用layout_weight,也将会增加一倍耗时操作。由于使用LinearLayout的layout_weight,大多数时间是不一样的，这会降低测量的速度。这只是一个如何合理使用Layout的案例，必要的时候，你要小心考虑是否用layout weight。总之减少层级结构，才是王道，让onMeasure做延迟加载，用viewStub，include等一些技巧。
+* 能用两层LinearLayout，尽量用一个RelativeLayout，在时间上此时RelativeLayout耗时更小。另外LinearLayout慎用```layout_weight```,也将会增加一倍耗时操作。由于使用LinearLayout的```layout_weight```,大多数时间是不一样的，这会降低测量的速度。这只是一个如何合理使用Layout的案例，必要的时候，你要小心考虑是否用layout weight。总之减少层级结构，才是王道，让onMeasure做延迟加载，用viewStub，include等一些技巧。
 
-1.3 使用wrap_content、match_parent、权重
+1.3 使用```wrap_content、match_parent```、权重
 
-使用 “wrap_content” 和 “match_parent” 尺寸值而不是硬编码的尺寸，系统会自动计算相应的数值，视图就会相应地使用自身所需的空间或填满可用空间，让布局正确适应各种屏幕尺寸和屏幕方向，组件的权重比同理。
+使用 ```“wrap_content” ```和 ```“match_parent”``` 尺寸值而不是硬编码的尺寸，系统会自动计算相应的数值，视图就会相应地使用自身所需的空间或填满可用空间，让布局正确适应各种屏幕尺寸和屏幕方向，组件的权重比同理。
 
 1.4 使用minWidth、minHeight、lines等属性
 很多时候我们显示的数据都是由后台返回的，再由我们加工处理后去适配我们的组件，这些数据的长度我们是无法确定的，而正常情况下我们构思的布局都仅是适用于理想的情况下，为了保证界面的对齐、数据显示完整等等的原因，我们需要在构思布局时增加对组件最小宽高度、行数等属性的设置，确保在特殊的数据下不会破坏我们的整体布局。
@@ -345,20 +345,30 @@ res/layout-sw600dp/activity_main.xml，双面板布局： Small Width 最小宽�
 这就要求我们维护两个相同功能的文件。为了避免繁琐操作，我们就要使用布局别名。
 
 2.3 使用布局别名
+
+```
 res/layout/activity_main.xml: 单面板布局
 res/layout-large/activity_main.xml: 多面板布局
 res/layout-sw600dp/activity_main.xml: 多面板布局
+```
+
 由于后两个文具文件一样，我们可以用以下两个文件代替上面三个布局文件：
 
+```
 res/layout/activity_main.xml 单面板布局
 res/layout/activity_main_twopanes.xml 双面板布局
+```
 
 然后在res下建立
+
+```
 res/values/layout.xml、
 res/values-large/layout.xml、
 res/values-sw600dp/layout.xml三个文件。
+```
 
 默认布局
+
 res/values/layout.xml:
 
 ```
@@ -1082,7 +1092,7 @@ ActivityThread thread = new ActivityThread();
 thread.attach(false);
 ```
 
-thread.attach(false);便会创建一个Binder线程（具体是指ApplicationThread，该Binder线程会通过Handler将Message发送给主线程，之后讲)。我们之前提到主线程最后会进入无限循环当中，如果没有在进入死循环之前创建其他线程，那么待会谁会给主线程发消息呢？，没错就是在这里创建了这个线程，这个线程会接收来自系统服务发送来的一些事件封装了Message并发送给主线程，主线程在无限循环中从队列里拿到这些消息并处理这些消息。（Binder线程发生的消息包括LAUNCH_ACTIVITY，PAUSE_ACTIVITY 等等）
+thread.attach(false);便会创建一个Binder线程（具体是指ApplicationThread，该Binder线程会通过Handler将Message发送给主线程，之后讲)。我们之前提到主线程最后会进入无限循环当中，如果没有在进入死循环之前创建其他线程，那么待会谁会给主线程发消息呢？，没错就是在这里创建了这个线程，这个线程会接收来自系统服务发送来的一些事件封装了Message并发送给主线程，主线程在无限循环中从队列里拿到这些消息并处理这些消息。（Binder线程发生的消息包括```LAUNCH_ACTIVITY，PAUSE_ACTIVITY``` 等等）
 
 继续回到mian 函数的下一句代码Looper.loop() 那么重点来了，我们来看下Looper.loop()的源码：
 
@@ -1116,10 +1126,6 @@ public static void loop() {
 上面的代码，大家具体看下注释，这时候主线程（UI线程）执行到这一步就进入了死循环，不断地去拿消息队列里面的消息出来处理？那么问题来了
 
 1、UI线程一直在这个循环里跳不出来，主线程不会因为Looper.loop()里的死循环卡死吗，那还怎么执行其他的操作呢？
-
-在looper启动后，主线程上执行的任何代码都是被looper从消息队列里取出来执行的。也就是说主线程之后都是通过其他线程给它发消息来实现执行其他操作的。生命周期的回调也是如此的，系统服务ActivityManagerService通过Binder发送IPC调用给APP进程，App进程接到到调用后，通过App进程的Binder线程给主线程的消息队列插入一条消息来实现的。
-
-2、主线程是UI线程和用户交互的线程，优先级应该很高，主线程的死循环一直运行是不是会特别消耗CPU资源吗？App进程的其他线程怎么办？
 
 这基本是一个类似生产者消费者的模型，简单说如果在主线程的MessageQueue没有消息时，就会阻塞在loop的queue.next()方法里，这时候主线程会释放CPU资源进入休眠状态，直到有下个消息进来时候就会唤醒主线程，在2.2 版本以前，这套机制是用我们熟悉的线程的wait和notify 来实现的，之后的版本涉及到Linux pipe/epoll机制，通过往pipe管道写端写入数据来唤醒主线程工作。原理类似于I/O,读写是堵塞的，不占用CPU资源。
 
@@ -1304,9 +1310,9 @@ public final class ActivityThread{
 }
 ```
 
-H 果不出其然是Handler，而且是ActivityThread的内部类，看了一下它的handleMessage 方法，LAUNCH_ACTIVITY、PAUSE_ACTIVITY、RESUME_ACTIVITY...好多好多，H 类帮我们处理了好多声明周期的事情。那么再回到mH.sendMessage(msg)这句代码上，在Binder线程执行mH.sendMessage(msg);，由主线程创建的Handler mH实例发送消息到主线程的消息队列里，消息队列从无到有，主线程堵塞被唤醒，主线程loop拿到消息，并回调mH的handleMessage 方法处理LAUNCH_ACTIVITY 等消息。从而实现Activity的启动。
+H 果不出其然是Handler，而且是ActivityThread的内部类，看了一下它的handleMessage 方法，```LAUNCH_ACTIVITY、PAUSE_ACTIVITY、RESUME_ACTIVITY```...好多好多，H 类帮我们处理了好多声明周期的事情。那么再回到mH.sendMessage(msg)这句代码上，在Binder线程执行```mH.sendMessage(msg)```;，由主线程创建的Handler mH实例发送消息到主线程的消息队列里，消息队列从无到有，主线程堵塞被唤醒，主线程loop拿到消息，并回调mH的handleMessage 方法处理LAUNCH_ACTIVITY 等消息。从而实现Activity的启动。
 
-讲到这里，基本一个启动流程分析完了，大家可能比较想知道的是 mH.sendMessage(msg); 关于Hanlder是怎么把消息发到主线程的消息队列的？我们接下来就讲解下Handler，首先看下Handler的源码！我们先来看看我们经常用的Handler的无参构造函数，实际调用的是Handler(Callback callback, boolean async)构造函数（看注释）
+讲到这里，基本一个启动流程分析完了，大家可能比较想知道的是 ```mH.sendMessage(msg)```; 关于Hanlder是怎么把消息发到主线程的消息队列的？我们接下来就讲解下Handler，首先看下Handler的源码！我们先来看看我们经常用的Handler的无参构造函数，实际调用的是Handler(Callback callback, boolean async)构造函数（看注释）
 
 ```
 public Handler() {
@@ -1373,7 +1379,7 @@ private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMilli
         msg.setAsynchronous(true);
     }
     //调用MessageQueue 的enqueueMessage 方法把消息放入队列
-    return queue.MessageQueue(msg, uptimeMillis);
+    return queue.enqueueMessage(msg, uptimeMillis);
 }
 ```
 
@@ -2377,7 +2383,7 @@ if (actionMasked == MotionEvent.ACTION_DOWN
 ```
 
 * 第一个if中的判断限制了，必须是ACTION_DOWN事件，或者mFirstTouchTarget != null才会询问onInterceptTouchEvent()要不要拦截事件，否则ViewGroup就直接拦截了。
-* 在第二个if的逻辑中，我们看到它先检查ViewGroup是否有FLAG_DISALLOW_INTERCEPT标志，如果有就直接不进行拦截，如果没有才会询问onInterceptTouchEvent()要不要拦截。这个标志在上一步中也出现了，只不过是清理掉它，所以ACTION_DOWN发生时，ViewGroup肯定是没这个标志的。那什么时候可能会有呢？只有在有子View处理触摸事件流的过程中，有子View调用```requestDisallowInterceptTouchEvent()```，可以给ViewGroup添加这个标志位。
+* 在第二个if的逻辑中，我们看到它先检查ViewGroup是否有```FLAG_DISALLOW_INTERCEPT```标志，如果有就直接不进行拦截，如果没有才会询问onInterceptTouchEvent()要不要拦截。这个标志在上一步中也出现了，只不过是清理掉它，所以ACTION_DOWN发生时，ViewGroup肯定是没这个标志的。那什么时候可能会有呢？只有在有子View处理触摸事件流的过程中，有子View调用```requestDisallowInterceptTouchEvent()```，可以给ViewGroup添加这个标志位。
 
 > 知识点：如果子View在ACTION_DWON时处理了事件，那么后面可以通过requestDisallowInterceptTouchEvent(true)来禁止父View拦截后续事件。
 
@@ -2979,10 +2985,10 @@ private void checkForLongClick(int delayOffset, float x, float y) {
 
 通过以上代码可以看出：
 
-* 当发生ACTION_DOWN的时候，开始长按监测，如果用户手指按下时间超过500ms才会发生长按事件，少于500ms就是onClick事件；可以得知，是否是长按事件是在Java层进行判断的，并且和ACTION_MOVE事件没有关系。
-* onLongClick方法返回true之后会将mHasPerformedLongPress属性置为true，在Up的时候就不会执行onClick，如果onlongClick返回false在Up事件到来时就会执行onClick
+* 当发生```ACTION_DOWN```的时候，开始长按监测，如果用户手指按下时间超过500ms才会发生长按事件，少于500ms就是onClick事件；可以得知，是否是长按事件是在Java层进行判断的，并且和```ACTION_MOVE```事件没有关系。
+* onLongClick方法返回true之后会将```mHasPerformedLongPress```属性置为true，在Up的时候就不会执行onClick，如果onlongClick返回false在Up事件到来时就会执行onClick
 * onClick是否会发生的前提是当前View是可点击的，并且它收到了Down和Up事件，
-* 只要View的CLICKABLE和LONG_CLICKABLE有一个为TRUE，那么该View就会消耗掉该事件，可以看出以上无论是Down、Move还是Up事件，最终都return true；
+* 只要View的```CLICKABLE```和```LONG_CLICKABLE```有一个为TRUE，那么该View就会消耗掉该事件，可以看出以上无论是Down、Move还是Up事件，最终都return true；
 
 * 讲解一
 
@@ -2990,7 +2996,7 @@ private void checkForLongClick(int delayOffset, float x, float y) {
 
 * 讲解二
 
-讲解二中只要有一个条件满足。就会进入switch语句。当接收到MotionEvent.ACTION_UP时(前提MotionEvent.ACTION_DOWN也接收到了)会经过判断最后执行 performClick();方法。
+讲解二中只要有一个条件满足。就会进入switch语句。当接收到```MotionEvent.ACTION_UP```时(前提```MotionEvent.ACTION_DOWN```也接收到了)会经过判断最后执行 performClick();方法。
 
 * 讲解三
 
@@ -4862,15 +4868,15 @@ private void finish(Result result) {
 
 总结
 
-1. 任务线程池类（THREAD_POOL_EXECUTOR）实际上是1个已配置好的可执行并行任务的线程池
-2. 调用THREAD_POOL_EXECUTOR.execute（）实际上是调用线程池的execute()去执行具体耗时任务
+1. 任务线程池类（```THREAD_POOL_EXECUTOR```）实际上是1个已配置好的可执行并行任务的线程池
+2. 调用```THREAD_POOL_EXECUTOR.execute（）```实际上是调用线程池的execute()去执行具体耗时任务
 3. 该耗时任务则是构造方法中初始化的 WorkerRunnable实例对象时复写的call（）内容
 4. 在call（）方法里，先调用 我们复写的doInBackground(mParams)执行耗时操作
 5. 再调用postResult(result)， 通过 InternalHandler 类 将任务消息传递到主线程；根据消息标识（MESSAGE_POST_RESULT）判断，最终通过finish(）调用我们复写的onPostExecute(result)，从而实现UI更新操作
 
 #### 源码总结
 
-![image](pic/454.png)
+![image](pic/p454.png)
 
 
 

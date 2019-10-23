@@ -271,8 +271,8 @@ Intent.FLAG_ACTIVITY_SINGLE_TOP多用来做辅助作用，跟launchmode中的sin
 
 四、源码分析
 
-为什么非Activity启动Activity要强制规定使用参数FLAG_ACTIVITY_NEW_TASK
-从源码上说，ContextImpl在前期做了检查，如果没添加Intent.FLAG_ACTIVITY_NEW_TASK就抛出异常，
+为什么非Activity启动Activity要强制规定使用参数```FLAG_ACTIVITY_NEW_TASK```
+从源码上说，ContextImpl在前期做了检查，如果没添加```Intent.FLAG_ACTIVITY_NEW_TASK```就抛出异常，
 
 ```
 @Override
@@ -288,7 +288,7 @@ public void startActivity(Intent intent, Bundle options) {
 }
 ```
 
-为什么要这么呢？其实直观很好理解，如果不是在Activity中启动的，那就可以看做不是用户主动的行为，也就说这个界面可能出现在任何APP之上，如果不用Intent.FLAG_ACTIVITY_NEW_TASK将其限制在自己的Task中，那用户可能会认为该Activity是当前可见APP的页面，这是不合理的。举个例子：我们在听音乐，这个时候如果邮件Service突然要打开一个Activity，如果不用Intent.FLAG_ACTIVITY_NEW_TASK做限制，那用户可能认为这个Activity是属于音乐APP的，因为用户点击返回的时候，可能会回到音乐，而不是邮件（如果邮件之前就有界面）。
+为什么要这么呢？其实直观很好理解，如果不是在Activity中启动的，那就可以看做不是用户主动的行为，也就说这个界面可能出现在任何APP之上，如果不用```Intent.FLAG_ACTIVITY_NEW_TASK```将其限制在自己的Task中，那用户可能会认为该Activity是当前可见APP的页面，这是不合理的。举个例子：我们在听音乐，这个时候如果邮件Service突然要打开一个Activity，如果不用```Intent.FLAG_ACTIVITY_NEW_TASK```做限制，那用户可能认为这个Activity是属于音乐APP的，因为用户点击返回的时候，可能会回到音乐，而不是邮件（如果邮件之前就有界面）。
 
 ## 一般Activity的启动流程
 
