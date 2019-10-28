@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="" />
+    <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest02.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Android面试SDK源码篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试SDK源码篇.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/algorithm/node/NodeDemo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/algorithm/node/NodeDemo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeTest01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeTest02.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest02.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithm/sort/SortTest01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +49,9 @@
         <option value="Class" />
       </list>
     </option>
+  </component>
+  <component name="FindBugs-IDEA-Workspace">
+    <toolWindowEditorPreview>false</toolWindowEditorPreview>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -99,29 +112,49 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.SortDemo.test">
+  <component name="RunManager" selected="JUnit.SortTest02.test">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestStack" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="algorithm.TestStack" />
-      <module name="Good Salary" />
+    <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="algorithm.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Application" factoryName="Application">
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <configuration name="NodeDemo.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithm.node.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="algorithm.node" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.node.NodeDemo" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NodeTest02.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="algorithm.node.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="algorithm.node" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.node.NodeTest02" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -143,7 +176,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SortTest01.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="SortTest02.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Good Salary" />
       <extension name="coverage">
         <pattern>
@@ -152,25 +185,8 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="algorithm.sort" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortTest01" />
+      <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortTest02" />
       <option name="METHOD_NAME" value="test" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestStack.isStack" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="Good Salary" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="algorithm.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="algorithm" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.TestStack" />
-      <option name="METHOD_NAME" value="isStack" />
       <option name="TEST_OBJECT" value="method" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <method v="2">
@@ -221,11 +237,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.SortTest02.test" />
+        <item itemvalue="JUnit.NodeTest02.test" />
+        <item itemvalue="JUnit.NodeDemo.test" />
         <item itemvalue="JUnit.SortDemo.test" />
         <item itemvalue="JUnit.TestStack.test" />
-        <item itemvalue="Application.TestStack" />
-        <item itemvalue="JUnit.TestStack.isStack" />
-        <item itemvalue="JUnit.SortTest01.test" />
       </list>
     </recent_temporary>
   </component>
@@ -321,6 +337,8 @@
       <workItem from="1571046323690" duration="11892000" />
       <workItem from="1571644638911" duration="9860000" />
       <workItem from="1571827460412" duration="199000" />
+      <workItem from="1572143862065" duration="28000" />
+      <workItem from="1572143903158" duration="7019000" />
     </task>
     <servers />
   </component>

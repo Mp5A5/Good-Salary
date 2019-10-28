@@ -2,17 +2,20 @@ package algorithm.sort;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
-/** 作者：王文彬 on 2019/10/17 11：08 邮箱：wwb199055@126.com */
-public class SortTest01 {
+/** 作者：王文彬 on 2019/10/27 11：51 邮箱：wwb199055@126.com */
+public class SortTest02 {
+
+  @Test
+  public void test() {
+    int[] array = new int[] {5, 8, 6, 3, 9, 2, 1, 7};
+    System.out.println(Arrays.toString(heapSort(array)));
+  }
 
   public int[] bubbleSort(int[] srcArray) {
     int lastChangeIndex = 0;
-    int sortBorder = srcArray.length - 1;
+    int sortBorder = srcArray.length - 1; // 一定要-1 否则 j + 1 会数组越界
     for (int i = 0; i < srcArray.length; i++) {
       boolean isSorted = true;
       for (int j = 0; j < sortBorder; j++) {
@@ -58,17 +61,15 @@ public class SortTest01 {
       max = Math.max(max, value);
       min = Math.min(min, value);
     }
-
-    int bucketNum = (max - min) / srcArray.length + 1;
-
-    ArrayList<LinkedList<Integer>> bucketList = new ArrayList<>();
-    for (int i = 0; i < bucketNum; i++) {
+    int bucketNums = (max - min) / srcArray.length + 1;
+    List<LinkedList<Integer>> bucketList = new ArrayList<>();
+    for (int i = 0; i < bucketNums; i++) {
       bucketList.add(new LinkedList<>());
     }
 
-    for (int i = 0; i < srcArray.length; i++) {
-      int index = (srcArray[i] - min) / srcArray.length;
-      bucketList.get(index).add(srcArray[i]);
+    for (int item : srcArray) {
+      int index = (item - min) / srcArray.length;
+      bucketList.get(index).add(item);
     }
 
     for (LinkedList<Integer> list : bucketList) {
@@ -86,17 +87,16 @@ public class SortTest01 {
 
   public int[] heapSort(int[] srcArray) {
     int len = srcArray.length;
-    buildMaxHeap(srcArray, len);
+    buildMaxHead(srcArray, len);
     for (int i = len - 1; i > 0; i--) {
       swap(srcArray, 0, i);
       len--;
       heapify(srcArray, 0, len);
     }
-
     return srcArray;
   }
 
-  private void buildMaxHeap(int[] srcArray, int len) {
+  private void buildMaxHead(int[] srcArray, int len) {
     for (int i = (int) Math.floor(len / 2); i >= 0; i--) {
       heapify(srcArray, i, len);
     }
@@ -106,11 +106,9 @@ public class SortTest01 {
     int left = 2 * i + 1;
     int right = 2 * i + 2;
     int largest = i;
-
     if (left < len && srcArray[left] > srcArray[largest]) {
       largest = left;
     }
-
     if (right < len && srcArray[right] > srcArray[largest]) {
       largest = right;
     }

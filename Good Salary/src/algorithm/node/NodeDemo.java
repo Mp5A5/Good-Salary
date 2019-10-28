@@ -17,7 +17,7 @@ public class NodeDemo {
     node3.next = node4;
     node4.next = node5;
     node5.next = null;
-    printNode(reverseKGroup(node1, 2));
+    printNode(reverseByRecursion(node1));
   }
 
   public static void printNode(Node head) {
