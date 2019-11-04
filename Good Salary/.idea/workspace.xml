@@ -2,14 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3b248c81-5afa-487c-8f80-8884e30c8895" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest02.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Android面试SDK源码篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Android面试SDK源码篇.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/kt/attr/Attr.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/kt/clazz/Clazz.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/kt/observe/Observe.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/algorithm/node/NodeDemo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/algorithm/node/NodeDemo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeDemo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeTest01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest01.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithm/node/NodeTest02.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/node/NodeTest02.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithm/sort/SortTest01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithm/sort/SortTest01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_01.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/recover/Java_01.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Good Salary/thread/breakThread/Interrupted$SleepRunner.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Good Salary/thread/breakThread/Interrupted$SleepRunner.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recover/Java_01.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/recover/Java_01.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/thread/breakThread/Interrupted.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/thread/breakThread/Interrupted.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Java基础知识.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java基础知识.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Java面试基础&amp;高级篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试基础&amp;高级篇.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" beforeDir="false" afterPath="$PROJECT_DIR$/../Java面试多线程和锁篇.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -44,9 +46,11 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin File" />
         <option value="Interface" />
         <option value="Class" />
+        <option value="Kotlin Interface" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin File" />
       </list>
     </option>
   </component>
@@ -112,9 +116,23 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.SortTest02.test">
+  <component name="RunManager" selected="Application.Interrupted">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Interrupted" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="thread.breakThread.Interrupted" />
+      <module name="Good Salary" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="thread.breakThread.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -125,16 +143,32 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NodeDemo.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="Test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Good Salary" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="algorithm.node.*" />
+          <option name="PATTERN" value="kt.clazz.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="algorithm.node" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.node.NodeDemo" />
+      <option name="PACKAGE_NAME" value="kt.clazz" />
+      <option name="MAIN_CLASS_NAME" value="kt.clazz.Test" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test.test (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Good Salary" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="kt.attr.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="kt.attr" />
+      <option name="MAIN_CLASS_NAME" value="kt.attr.Test" />
       <option name="METHOD_NAME" value="test" />
       <option name="TEST_OBJECT" value="method" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -142,16 +176,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NodeTest02.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="Test.test (2)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Good Salary" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="algorithm.node.*" />
+          <option name="PATTERN" value="kt.observe.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="algorithm.node" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.node.NodeTest02" />
+      <option name="PACKAGE_NAME" value="kt.observe" />
+      <option name="MAIN_CLASS_NAME" value="kt.observe.Test" />
       <option name="METHOD_NAME" value="test" />
       <option name="TEST_OBJECT" value="method" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -159,50 +193,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SortDemo.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ThreadJoinDemo.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Good Salary" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="algorithm.sort.*" />
+          <option name="PATTERN" value="thread.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="algorithm.sort" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortDemo" />
-      <option name="METHOD_NAME" value="test" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SortTest02.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="Good Salary" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="algorithm.sort.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="algorithm.sort" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.sort.SortTest02" />
-      <option name="METHOD_NAME" value="test" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestStack.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="Good Salary" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="algorithm.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="algorithm" />
-      <option name="MAIN_CLASS_NAME" value="algorithm.TestStack" />
+      <option name="PACKAGE_NAME" value="thread" />
+      <option name="MAIN_CLASS_NAME" value="thread.ThreadJoinDemo" />
       <option name="METHOD_NAME" value="test" />
       <option name="TEST_OBJECT" value="method" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -237,11 +237,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.SortTest02.test" />
-        <item itemvalue="JUnit.NodeTest02.test" />
-        <item itemvalue="JUnit.NodeDemo.test" />
-        <item itemvalue="JUnit.SortDemo.test" />
-        <item itemvalue="JUnit.TestStack.test" />
+        <item itemvalue="Application.Interrupted" />
+        <item itemvalue="JUnit.ThreadJoinDemo.test" />
+        <item itemvalue="JUnit.Test.test (2)" />
+        <item itemvalue="JUnit.Test" />
+        <item itemvalue="JUnit.Test.test (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -339,6 +339,9 @@
       <workItem from="1571827460412" duration="199000" />
       <workItem from="1572143862065" duration="28000" />
       <workItem from="1572143903158" duration="7019000" />
+      <workItem from="1572428600054" duration="3140000" />
+      <workItem from="1572445461235" duration="2535000" />
+      <workItem from="1572870592437" duration="320000" />
     </task>
     <servers />
   </component>

@@ -1,6 +1,7 @@
 package recover;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /** 作者：王文彬 on 2019-04-24 13：38 邮箱：wwb199055@126.com */
 public class Java_01 {
@@ -31,7 +32,7 @@ public class Java_01 {
     System.out.println("aString hashCode: " + aString.hashCode());
     System.out.println("bString hashCode: " + bString.hashCode());*/
 
-    int limit = -Integer.MAX_VALUE;
+    /*int limit = -Integer.MAX_VALUE;
     System.out.println(limit);
 
     String s="21";
@@ -47,6 +48,11 @@ public class Java_01 {
 
     System.out.println(result);
 
-    System.out.println(new ArrayList<Integer>().getClass() == new ArrayList<String>().getClass());  // true
+    System.out.println(new ArrayList<Integer>().getClass() == new ArrayList<String>().getClass());  // true*/
+
+    int[] arr = {1,2,3,4,5};
+    int [] temp = new int[10];
+    System.arraycopy(arr,0,temp,0,5);
+    System.out.println(Arrays.toString(temp));
   }
 }

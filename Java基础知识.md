@@ -1,37 +1,43 @@
 ## java中==和equals和hashCode的区别
 
-java中的数据类型，可分为两类：   
-1.基本数据类型，也称原始数据类型。  
-  byte,short,char,int,long,float,double,boolean 他们之间的比较，应用双等号（==）,比较的是他们的值。   
-2.复合数据类型(类)   
-  当他们用（==）进行比较的时候，比较的是他们在内存中的存放地址，所以，除非是同一个new出来的对象，他们的比较后的结果为true，否则比较后结果为false。 JAVA当中所有的类都是继承于Object这个基类的，在Object中的基类中定义了一个equals的方法，这个方法的初始行为是比较对象的内存地址，但在一些类库当中这个方法被覆盖掉了，如String,Integer,Date在这些类当中equals有其自身的实现，而不再是比较类在堆内存中的存放地址了。  
-  对于复合数据类型之间进行equals比较，在没有覆写equals方法的情况下，他们之间的比较还是基于他们在内存中的存放位置的地址值的，因为Object的equals方法也是用双等号（==）进行比较的，所以比较后的结果跟双等号（==）的结果相同。
-    
-#### ==
+java中的数据类型，可分为两类：  
+ 
+1. 基本数据类型，也称原始数据类型。  
+  byte,short,char,int,long,float,double,boolean 他们之间的比较，应用双等号（```==```）,比较的是他们的值。   
+2. 复合数据类型(类)   
 
-== 比较的是变量(栈)内存中存放的对象的(堆)内存地址，用来判断两个对象的地址是否相同，即是否是指相同一个对象。比较的是真正意义上的指针操作。
+* 当他们用（```==```）进行比较的时候，比较的是他们在内存中的存放地址，所以，除非是同一个new出来的对象，他们的比较后的结果为true，否则比较后结果为false。  
+* 对于复合数据类型之间进行equals比较，在没有覆写equals方法的情况下，他们之间的比较还是基于他们在内存中的存放位置的地址值的，因为Object的equals方法也是用双等号（```==```）进行比较的，所以比较后的结果跟双等号（```==```）的结果相同。
+    
+### ==
+
+比较的是变量(栈)内存中存放的对象的(堆)内存地址，用来判断两个对象的地址是否相同，即是否是指相同一个对象。比较的是真正意义上的指针操作。
 
 1. 比较的是操作符两端的操作数是否是同一个对象。
 2. 两边的操作数必须是同一类型的（可以是父子类之间）才能编译通过。
 3. 比较的是地址，如果是具体的阿拉伯数字的比较，值相等则为true，如：int a=10 与 long b=10L 与 double c=10.0都是相同的（为true），因为他们都指向地址为10的堆。
 
-#### equals：
+### equals：
 
-1. Object类中默认的实现方式是  :   return this == obj  。那就是说，只有this 和 obj引用同一个对象，才会返回true。
-而我们往往需要用equals来判断 2个对象是否等价，而非验证他们的唯一性。这样我们在实现自己的类时，就要重写equals.
+equals用来比较的是两个对象的内容是否相等，由于所有的类都是继承自java.lang.Object类的，所以适用于所有对象，如果没有对该方法进行覆盖的话，调用的仍然是Object类中的方法，而Object中的equals方法返回的却是==的判断。Object类中默认的实现方式是 : ```return this == obj```  。那就是说，只有this 和 obj引用同一个对象，才会返回true。
+
+而我们往往需要用equals来判断2个对象是否等价，而非验证他们的唯一性。这样我们在实现自己的类时，就要重写equals.
+
 按照约定，equals要满足以下规则。
+
 * 自反性:  x.equals(x) 一定是true
 * 非空性:  x.equals(null) 一定是false
 * 对称性:  x.equals(y)  和  y.equals(x)结果一致
 * 传递性:  a 和 b equals , b 和 c  equals，那么 a 和 c也一定equals。
-* 一致性:  在某个运行时期间，2个对象的状态的改变不会不影响equals的决策结果，那么，在这个运行时期间，无论调用多少次equals，都返回相同的结果。  
-2. equals用来比较的是两个对象的内容是否相等，由于所有的类都是继承自java.lang.Object类的，所以适用于所有对象，如果没有对该方法进行覆盖的话，调用的仍然是
+* 一致性:  在某个运行时期间，2个对象的状态的改变不会不影响equals的决策结果，那么，在这个运行时期间，无论调用多少次equals，都返回相同的结果。 
 
-Object类中的方法，而Object中的equals方法返回的却是==的判断。
+### String串：
 
-　　String s="abce"是一种非常特殊的形式,和new 有本质的区别。它是java中唯一不需要new 就可以产生对象的途径。以String s="abce";形式赋值在java中叫直接量,它是在常量池中而不是象new一样放在压缩堆中。这种形式的字符串，在JVM内部发生字符串拘留，即当声明这样的一个字符串后，JVM会在常量池中先查找有有没有一个值为"abcd"的对象,如果有,就会把它赋给当前引用.即原来那个引用和现在这个引用指点向了同一对象,如果没有,则在常量池中新创建一个"abcd",下一次如果有String s1 = "abcd";又会将s1指向"abcd"这个对象,即以这形式声明的字符串,只要值相等,任何多个引用都指向同一对象.  
-　　而String s = new String("abcd");和其它任何对象一样.每调用一次就产生一个对象，只要它们调用。  
-　　也可以这么理解: String str = "hello"; 先在内存中找是不是有"hello"这个对象,如果有，就让str指向那个"hello".如果内存里没有"hello"，就创建一个新的对象保存"hello". String str=new String ("hello") 就是不管内存里是不是已经有"hello"这个对象，都新建一个对象保存"hello"。  
+String s="abce"是一种非常特殊的形式,和new 有本质的区别。它是java中唯一不需要new 就可以产生对象的途径。以String s="abce";形式赋值在java中叫直接量,它是在常量池中而不是象new一样放在压缩堆中。这种形式的字符串，在JVM内部发生字符串拘留，即当声明这样的一个字符串后，JVM会在常量池中先查找有有没有一个值为"abcd"的对象,如果有,就会把它赋给当前引用.即原来那个引用和现在这个引用指点向了同一对象,如果没有,则在常量池中新创建一个"abcd",下一次如果有String s1 = "abcd";又会将s1指向"abcd"这个对象,即以这形式声明的字符串,只要值相等,任何多个引用都指向同一对象.  
+
+而String s = new String("abcd");和其它任何对象一样.只要它们调用,每调用一次就产生一个对象。  
+
+也可以这么理解: String str = "hello"; 先在内存中找是不是有"hello"这个对象,如果有，就让str指向那个"hello".如果内存里没有"hello"，就创建一个新的对象保存"hello". String str=new String ("hello") 就是不管内存里是不是已经有"hello"这个对象，都新建一个对象保存"hello"。  
 
 ```java
 public class TestString {
@@ -46,6 +52,7 @@ public class TestString {
    }
 }
 ```
+
 编译并运行程序，输出：s1 == s2说明：s1 与 s2 引用同一个 String 对象 -- "Monday"!  
 再稍微改动一下程序，会有更奇怪的发现：
 
@@ -75,8 +82,8 @@ s1 equals s2
 
 #### 字符串缓冲池
 
-程序在运行的时候会创建一个字符串缓冲池当使用 s2 = "Monday" 这样的表达是创建字符串的时候，程序首先会在这个String缓冲池中寻找相同值的对象，在第一个程序中，s1先被放到了池中，所以在s2被创建的时候，程序找到了具有相同值的 s1
-将s2引用s1所引用的对象"Monday"
+程序在运行的时候会创建一个字符串缓冲池当使用 s2 = "Monday" 这样的表达是创建字符串的时候，程序首先会在这个String缓冲池中寻找相同值的对象，在第一个程序中，s1先被放到了池中，所以在s2被创建的时候，程序找到了具有相同值的 s1将s2引用s1所引用的对象"Monday"
+
 第二段程序中，使用了 new 操作符，他明白的告诉程序："我要一个新的！不要旧的！"于是一个新的"Monday"Sting对象被创建在内存中。他们的值相同，但是位置不同。  
 再次更改程序： 
 
@@ -104,32 +111,42 @@ public class TestString {
 程序输出：  
 s1 == s2  
 s1 equals s2  
-原 来，（java.lang.String的intern()方法"abc".intern()方法的返回值还是字符串"abc"，表面上看起来好像这个方法没什么用处。但实际上，它做了个小动作：检查字符串池里是否存在"abc"这么一个字符串，如果存在，就返回池里的字符串；如果不存在，该方法会 把"abc"添加到字符串池中，然后再返回它的引用。
 
-#### hashCode：
+（java.lang.String的intern()方法"abc".intern()方法的返回值还是字符串"abc"，表面上看起来好像这个方法没什么用处。但实际上，它做了个小动作：检查字符串池里是否存在"abc"这么一个字符串，如果存在，就返回池里的字符串；如果不存在，该方法会把"abc"添加到字符串池中，然后再返回它的引用。
 
-这个方法返回对象的散列码，返回值是int类型的散列码（将该对象的内部地址转换成一个整数返回）。HashCode的存在主要是为了查找的快捷性，HashCode是用来在散列存储结构中确定对象的存储地址的。例如hashMap就是利用hashcode来计算存入哪一个entry的。  
+### hashCode：
+
+这个方法返回对象的散列码，返回值是int类型的散列码（将该对象的内部地址转换成一个整数返回）。HashCode的存在主要是为了查找的快捷性，HashCode是用来在散列存储结构中确定对象的存储地址的。例如hashMap就是利用hashcode来计算存入哪一个entry的。
+  
 hashCode方法，一致的约定是：
 
-* 两个对象的hashcode相同，对象不一定是一个对象（equals（Object obj）不一定返回true）。
-* 两个对象的hashcode不同，他们一定不equals（equals（Object obj）一定返回false）。
+* 两个对象的hashcode相同，对象不一定是同一个对象（equals不一定返回true）。
+* 两个对象的hashcode不同，他们一定不equals（equals一定返回false）。
 * 如果两个对象的equals相同，，Java运行时环境会认为他们的hashcode一定相等。
-* 如果两个对象的equals不同，，hashCode（）不一定返回不同的int数。
+* 如果两个对象的equals不同，，hashCode不一定返回不同的int数。
 * 对于equals和hashcode，如果重写了equals方法，那么也尽量重写hashcode方法。
 * 同一对象在执行期间若已经存储在集合中，则不能修改影响hashCode值的相关信息，否则会导致内存泄露问题。
 
 hashCode作用：
-Java中的集合（Collection）有两类，一类是List，再有一类是Set。前者集合内的元素是有序的，元素可以重复；后者元素无序，但元素不可重复。  
+
+Java中的集合（Collection）有两类，一类是List，再有一类是Set。前者集合内的元素是有序的，元素可以重复；后者元素无序，但元素不可重复。
+  
 那么这里就有一个比较严重的问题了：要想保证元素不重复，可两个元素是否重复应该依据什么来判断呢？  
-这就是Object.equals方法了。但是，如果每增加一个元素就检查一次，那么当元素很多时，后添加到集合中的元素比较的次数就非常多了。也就是说，如果集合中现在已经有1000个元素，那么第1001个元素加入集合时，它就要调用1000次equals方法。这显然会大大降低效率。     
+这就是Object.equals方法了。但是，如果每增加一个元素就检查一次，那么当元素很多时，后添加到集合中的元素比较的次数就非常多了。也就是说，如果集合中现在已经有1000个元素，那么第1001个元素加入集合时，它就要调用1000次equals方法。这显然会大大降低效率。  
+   
 于是，Java采用了哈希表的原理。    
-这样一来，当集合要添加新的元素时，先调用这个元素的hashCode方法，就一下子能定位到它应该放置的物理位置上。   
+这样一来，当集合要添加新的元素时，先调用这个元素的hashCode方法，就一下子能定位到它应该放置的物理位置上。  
+ 
 如果这个位置上没有元素，它就可以直接存储在这个位置上，不用再进行任何比较了；  
+
 如果这个位置上已经有元素了，就调用它的equals方法与新元素进行比较，相同的话就不存，不相同就散列其它的地址。所以这里存在一个冲突解决的问题。这样一来实际调用equals方法的次数就大大降低了，几乎只需要一两次。
 
-在集合操作的时候有如下规则：  
-将对象放入到集合中时，首先判断要放入对象的hashcode值与集合中的任意一个元素的hashcode值是否相等，如果不相等直接将该对象放入集合中。如果hashcode值相等，然后再通过equals方法判断要放入对象与集合中的任意一个对象是否相等，如果equals判断不相等，直接将该元素放入到集合中，否则不放入。  
-回过来说get的时候，HashMap也先调key.hashCode()算出数组下标，然后看equals如果是true就是找到了，所以就涉及了equals。  
+==在集合操作的时候有如下规则:==
+
+1. 将对象放入到集合中时，首先判断要放入对象的hashcode值与集合中的任意一个元素的hashcode值是否相等，如果不相等直接将该对象放入集合中。如果hashcode值相等，然后再通过equals方法判断要放入对象与集合中的任意一个对象是否相等，如果equals判断不相等，直接将该元素放入到集合中，否则不放入。 
+ 
+2. get的时候，HashMap也先调key.hashCode()算出数组下标，然后看equals如果是true就是找到了，所以就涉及了equals。  
+
 《Effective Java》书中有两条是关于equals和hashCode的：  
 
 覆盖equals时需要遵守的通用约定： 
@@ -137,6 +154,7 @@ Java中的集合（Collection）有两类，一类是List，再有一类是Set�
 覆盖equals方法看起来似乎很简单，但是如果覆盖不当会导致错误，并且后果相当严重。《Effective Java》一书中提到"最容易避免这类问题的办法就是不覆盖equals方法"
 
 一、不需要覆盖equals的情景
+
 1、类的每个实例本质上都是唯一的
 >对于代表活动实体而不是值(value)的类来说确实如此，比如Thread
 
@@ -156,7 +174,8 @@ public boolean equals(Object obj){
 }
 ```	
 
-二、、需要覆盖equals的情景
+二、需要覆盖equals的情景
+
 在覆盖equals方法的时候，你必须要遵守它的通用约定(自反性、对称性、传递性、一致性、非空性)。
 如果类具有自己特有的“逻辑相等”概念(不同于对象等同的概念)，而且父类还没有覆盖equals以实现期望行为，这时就需要覆盖equals方法。覆盖equals方法的时候，必须遵守以下通用约定
 结合以上要求，得出了以下实现高质量equals方法的诀窍： 
@@ -168,10 +187,12 @@ public boolean equals(Object obj){
 5. 当编写完成了equals方法之后，检查“对称性”、“传递性”、“一致性”。   
 
 
-覆盖equals时总要覆盖hashCode    
-一个很常见的错误根源在于没有覆盖hashCode方法。在每个覆盖了equals方法的类中，也必须覆盖hashCode方法。如果不这样做的话，就会违反Object.hashCode的通用约定，从而导致该类无法结合所有基于散列的集合一起正常运作，这样的集合包括HashMap、HashSet和Hashtable。  在应用程序的执行期间，只要对象的equals方法的比较操作所用到的信息没有被修改，那么对这同一个对象调用多次，hashCode方法都必须始终如一地返回同一个整数。在同一个应用程序的多次执行过程中，每次执行所返回的整数可以不一致。 如果两个对象根据equals()方法比较是相等的，那么调用这两个对象中任意一个对象的hashCode方法都必须产生同样的整数结果。 如果两个对象根据equals()方法比较是不相等的，那么调用这两个对象中任意一个对象的hashCode方法，则不一定要产生相同的整数结果。但是程序员应该知道，给不相等的对象产生截然不同的整数结果，有可能提高散列表的性能。
+覆盖equals时总要覆盖hashCode  
+  
+在每个覆盖了equals方法的类中，也必须覆盖hashCode方法。如果不这样做的话，就会违反Object.hashCode的通用约定，从而导致该类无法结合所有基于散列的集合一起正常运作，这样的集合包括HashMap、HashSet和Hashtable。  在应用程序的执行期间，只要对象的equals方法的比较操作所用到的信息没有被修改，那么对这同一个对象调用多次，hashCode方法都必须始终如一地返回同一个整数。在同一个应用程序的多次执行过程中，每次执行所返回的整数可以不一致。 如果两个对象根据equals()方法比较是相等的，那么调用这两个对象中任意一个对象的hashCode方法都必须产生同样的整数结果。 如果两个对象根据equals方法比较是不相等的，那么调用这两个对象中任意一个对象的hashCode方法，则不一定要产生相同的整数结果。但是程序员应该知道，给不相等的对象产生截然不同的整数结果，有可能提高散列表的性能。
 
-String中hashCode为减少hash碰撞采用奇素数31  
+String中hashCode为减少hash碰撞采用奇素数31 
+ 
 之所以选择31，是因为它是个奇素数。如果乘数是偶数，并且乘法溢出的话，信息就会丢失，因为与2相乘等价于移位运算。使用素数的好处并不是很明显，但是习惯上都使用素数来计算散列结果。31有个很好的特性，就是用移位和减法来代替乘法，可以得到更好的性能：31*i==(i<<5)-i。现在的VM可以自动完成这种优化。  
 关于奇数，在计算机中，一个数乘偶数表现为该数字左移n位，余位补0，因此可能造成信息丢失。比方说，一个二进制数字X4就可能导致两位数字丢失。1010 0110 -> 10011000  
 而奇数则没有这个问题，因为任何一个奇数都可以转换为2的n次方+1，表现在计算机中则是左移n位再加上自己。  
@@ -234,16 +255,16 @@ jdk中定义int占4个字节 ===> 32位(后面全部的计算都是以此为根�
   
 ## int与integer的区别
 
-#### 区别：
+### 区别：
 
 1. Integer是int的包装类，int则是java的一种基本数据类型 
 2. Integer变量必须实例化后才能使用，而int变量不需要 
 3. Integer实际是对象的引用，当new一个Integer时，实际上是生成一个指针指向此对象；而int则是直接存储数据值 
 4. Integer的默认值是null，int的默认值是0
 
-#### 自动拆装箱：
+### 自动拆装箱：
 
-##### 基本数据类型
+#### 基本数据类型
 
 基本类型，或者叫做内置类型，是Java中不同于类(Class)的特殊类型。它们是我们编程中使用最频繁的类型。  
 Java是一种强类型语言，第一次申明变量必须说明数据类型，第一次变量赋值称为变量的初始化。  
@@ -256,12 +277,12 @@ Java基本类型共有八种，基本类型可以分为三类：
 Java中的数值类型不存在无符号的，它们的取值范围是固定的，不会随着机器硬件环境或者操作系统的改变而改变。  
 实际上，Java中还存在另外一种基本类型void，它也有对应的包装类 java.lang.Void，不过我们无法直接对它们进行操作。
 
-###### 基本数据类型有什么好处
+##### 基本数据类型有什么好处
 
 在Java语言中，new一个对象是存储在堆里的，我们通过栈中的引用来使用这些对象；所以，对象本身来说是比较消耗资源的。  
 对于经常用到的类型，如int等，如果我们每次使用这种变量的时候都需要new一个Java对象的话，就会比较笨重。所以，和C++一样，Java提供了基本数据类型，这种数据的变量不需要使用new创建，他们不会在堆上创建，而是直接在栈内存中存储，因此会更加高效。
 
-##### 包装类型
+#### 包装类型
 
 Java语言是一个面向对象的语言，但是Java中的基本数据类型却是不面向对象的，这在实际使用时存在很多的不便，为了解决这个不足，在设计类时为每个基本数据类型设计了一个对应的类进行代表，这样八个和基本数据类型对应的类统称为包装类(Wrapper Class)。  
 包装类均位于java.lang包，包装类和基本数据类型的对应关系如下表所示： 
@@ -277,13 +298,12 @@ Java语言是一个面向对象的语言，但是Java中的基本数据类型却
 |double    |Double    |
 在这八个类名中，除了Integer和Character类以后，其它六个类的类名和基本数据类型一致，只是类名的第一个字母大写即可。
 
-####### 为什么需要包装类
+##### 为什么需要包装类
 
-很多人会有疑问，既然Java中为了提高效率，提供了八种基本数据类型，为什么还要提供包装类呢？  
-这个问题，其实前面已经有了答案，因为Java是一种面向对象语言，很多地方都需要使用对象而不是基本数据类型。比如，在集合类中，我们是无法将int 、double等类型放进去的。因为集合的容器要求元素是Object类型。  
+因为Java是一种面向对象语言，很多地方都需要使用对象而不是基本数据类型。比如，在集合类中，我们是无法将int 、double等类型放进去的。因为集合的容器要求元素是Object类型。  
 为了让基本类型也具有对象的特征，就出现了包装类型，它相当于将基本类型“包装起来”，使得它具有了对象的性质，并且为其添加了属性和方法，丰富了基本类型的操作。
 
-##### 拆箱与装箱
+#### 拆箱与装箱
 
 那么，有了基本数据类型和包装类，肯定有些时候要在他们之间进行转换。比如把一个基本数据类型的int转换成一个包装类型的Integer对象。  
 我们认为包装类是对基本类型的包装，所以，把基本数据类型转换成包装类的过程就是打包装，英文对应于boxing，中文翻译为装箱。  
@@ -294,7 +314,7 @@ Java语言是一个面向对象的语言，但是Java中的基本数据类型却
 Integer i = new Integer(10);
 ```
 
-##### 自动拆箱与自动装箱
+#### 自动拆箱与自动装箱
 
 在Java SE5以后，为了减少开发人员的工作，Java提供了自动拆箱与自动装箱功能。  
 自动装箱: 就是将基本数据类型自动转换成对应的包装类。  
@@ -325,12 +345,15 @@ public static void main(String[] paramArrayOfString) {
 }
 ```
 从上面反编译后的代码可以看出，int的自动装箱都是通过<font color = red>Integer.valueOf()</font>方法来实现的，Integer的自动拆箱都是通过<font color=red >integer.intValue</font>来实现的。  
+
 通过对八大基本类型的反编译可以发现：
->自动装箱都是通过包装类的<font color=red>valueOf()</font>方法来实现的.自动拆箱都是通过包装类对象的<font color= red>xxxValue()</font>来实现的。
+
+>自动装箱都是通过包装类的<font color=red>valueOf()</font>方法来实现的.
+>自动拆箱都是通过包装类对象的<font color= red>xxxValue()</font>来实现的。
 
 ##### 哪些地方会自动拆装箱
 
-###### 场景一、将基本数据类型放入集合类
+场景一、将基本数据类型放入集合类
 
 我们知道，Java中的集合类只能接收对象类型，但是下面代码却不报错
 
@@ -348,9 +371,10 @@ for (int i = 1; i < 50; i += 2){
     li.add(Integer.valueOf(i));
 }
 ```
+
 以上，我们可以得出结论，当我们把基本数据类型放入集合类中的时候，会进行自动装箱。
 
-###### 场景二、包装类型和基本类型的大小比较
+场景二、包装类型和基本类型的大小比较
 
 对Integer对象与基本类型进行大小比较的时候，实际上比较的是什么内容
 
@@ -370,7 +394,7 @@ System.out.println(bool.booleanValue?"真":"假");
 ```
 可以看到，包装类与基本数据类型进行比较运算，是先将包装类进行拆箱成基本数据类型，然后进行比较的。
 
-###### 场景三、包装类型的运算
+场景三、包装类型的运算
 
 我们对Integer对象进行四则运算的时候，是如何进行的呢？看以下代码：
 
@@ -388,7 +412,7 @@ System.out.println(i.intValue() + j.intValue());
 ```
 我们发现，两个包装类型之间的运算，会被自动拆箱成基本类型进行。
 
-###### 场景四、三目运算符的使用
+场景四、三目运算符的使用
 
 这是很多人不知道的一个场景，作者也是一次线上的血淋淋的Bug发生后才了解到的一种案例。看一个简单的三目运算符的代码：
 
@@ -411,7 +435,7 @@ System.out.println(k);
 因为例子中，flag ? i : j;片段中，第二段的i是一个包装类型的对象，而第三段的j是一个基本类型，所以会对包装类进行自动拆箱。如果这个时候i的值为null，那么久会发生NPE。
 [自动拆箱导致空指针异常](http://www.hollischuang.com/archives/435)
 
-###### 场景五、函数参数与返回值
+场景五、函数参数与返回值
 
 这个比较容易理解，直接上代码了：
 
@@ -426,7 +450,7 @@ public Integer getNum2(int num) {
 }
 ```
 
-##### 自动拆箱与缓存
+###### 自动拆箱与缓存
 
 Java SE的自动拆装箱还提供了一个和缓存有关的功能,首先看如下代码：
 
@@ -531,7 +555,7 @@ public static int parseInt(String s, int radix)
         //Integer.MAX_VALUE   2147483647
         //Integer.MIN_VALUE   -2147483648
         
-        //limit 默认初始化为 最大正整数的  负数 ，假如字符串表示的是正数，
+        //limit 默认初始化为最大正整数的负数 ，假如字符串表示的是正数，
 	     //那么result(在返回之前一直是负数形式)就必须和这个最大正数的负数来比较，判断是否溢出
         int limit = -Integer.MAX_VALUE;
         int multmin;
@@ -547,7 +571,7 @@ public static int parseInt(String s, int radix)
                 if (firstChar == '-') {
                     //负号属性设置为true
                     negative = true;
-                    // 这里，在负号的情况下，判断溢出的值就变成了 整数的 最小负数了。
+                    // 这里，在负号的情况下，判断溢出的值就变成了整数的最小负数了。
                     limit = Integer.MIN_VALUE;
                 }
                 //不是负号也不是加号则抛出异常
@@ -588,7 +612,7 @@ public static int parseInt(String s, int radix)
                 result *= radix;
                 // 这里也是判断溢出， 由于是负值来判断，相当于 （-result + digit）> - limit
 		         // 但是不能用这种形式，如果这样去比较，那么得出的值是肯定判断不出溢出的。
-		         // 所以用    result < limit + digit    很巧妙
+		         // 所以用result < limit + digit 很巧妙
                 if (result < limit + digit) {
                     throw NumberFormatException.forInputString(s);
                 }
@@ -642,7 +666,7 @@ public static int digit(int codePoint, int radix) {
 
 ## 探探对java多态的理解
 
-#### 面向对象编程有三大特性：封装、继承、多态。
+### 面向对象编程有三大特性：封装、继承、多态。
 
 ##### 封装
 
@@ -787,10 +811,12 @@ public void setAge(int age) {
 
 在《Java编程思想》中有这样一句话：复用代码是Java众多引人注目的功能之一。但要想成为极具革命性的语言，仅仅能够复制代码并对加以改变是不够的，它还必须能够做更多的事情。在这句话中最引人注目的是"复用代码",尽可能的复用代码使我们程序员一直在追求的，现在我来介绍一种复用代码的方式，也是java三大特性之一---继承。
 
-###### 概念
+一、概念
 
-<font color=blue> 继承是使用已存在的类的定义作为基础建立新类的技术，新类的定义可以增加新的数据或新的功能，也可以用父类的功能，但不能选择性地继承父类。</font>通过使用继承我们能够非常方便地复用以前的代码，能够大大的提高开发的效率。  
+<font color=blue> 继承是使用已存在的类的定义作为基础建立新类的技术，新类的定义可以增加新的数据或新的功能，也可以用父类的功能，但不能选择性地继承父类。</font>通过使用继承我们能够非常方便地复用以前的代码，能够大大的提高开发的效率。
+  
 继承所描述的是"is-a"的关系，如果有两个对象A和B，若可以描述为“A是B”，则可以表示A继承B，其中B是被继承者称之为父类或者超类，A是继承者称之为子类或者派生类。  
+
 实际上继承者是被继承者的特殊化，它除了拥有被继承者的特性外，还拥有自己独有得特性。例如猫有抓老鼠、爬树等其他动物没有的特性。同时在继承关系中，继承者完全可以替换被继承者，反之则不可以，例如我们可以说猫是动物，但不能说动物是猫就是这个道理，其实对于这个我们将其称之为"向上转型"。
 <font color=blue>继承定义了类如何相互关联，共享特性。</font>对于若干个相同或者相似的类，我们可以抽象出他们共有的行为或者属相并将其定义成一个父类或者超类，然后用这些类继承该父类，他们不仅可以拥有父类的属性、方法还可以定义自己独有的属性或者方法。  
 同时在使用继承时需要记住三句话：
@@ -801,7 +827,7 @@ public void setAge(int age) {
   
 <font color=red size=5 >**_总结：_**</font>使用继承确实有许多的优点，除了将所有子类的共同属性放入父类，实现代码共享，避免重复外，还可以使得修改扩展继承而来的实现比较简单。
   
-###### 构造器
+二、构造器
 
 构造器而言，它只能够被调用，而不能被继承。调用父类的构造方法我们使用super()即可。  
 对于子类而已,其构造器的正确初始化是非常重要的,而且当且仅当只有一个方法可以保证这点：在构造器中调用父类构造器来完成初始化，而父类构造器具有执行父类初始化所需要的所有知识和能力。
@@ -868,11 +894,11 @@ Husband Constructor...
 
 <font color=red size=5>**_总结：_**</font>对于继承，子类会默认调用父类的构造器，但是如果没有默认的父类构造器，子类必须要显示的指定父类的构造器，而且必须是在子类构造器中做的第一件事(第一行代码)。
 
-###### protected
+三、protected
 
 尽管可以使用protected访问修饰符来限制父类属性和方法的访问权限，但是最好的方式还是<font color=blue>将属性保持为private(我们应当一致保留更改底层实现)，通过protected方法来控制类的继承者的访问权限。</font>
 
-###### 向上转型
+四、向上转型
 
 在上面的继承中我们谈到继承是is-a的相互关系，猫继承与动物，所以我们可以说猫是动物，或者说猫是动物的一种。这样将猫看做动物就是向上转型。如下：
 
@@ -898,7 +924,7 @@ public class Husband extends Person{
 在这我们通过Person.display(husband)。这句话可以看出husband是person类型。  
 将子类转换成父类，在继承关系上面是向上移动的，所以一般称之为向上转型。由于向上转型是从一个叫专用类型向较通用类型转换，所以它总是安全的，唯一发生变化的可能就是属性和方法的丢失。这就是为什么编译器在"未曾明确表示转型"或者"未曾指定特殊标记"的情况下，仍然允许向上转型的原因。
 
-###### <font color=red>谨慎继承</font>
+五、谨慎继承
 
 继承存在如下缺陷：
 
@@ -1195,53 +1221,28 @@ public class A {
 
 ## String、StringBuffer、StringBuilder区别
 
-#### String
+### String
 
-不可变类，属性value为不可变数组，即String初始化构造器没有初始容量为16的概念，你定义多少，String中字符数组的长度就是多少，不存在字符数组扩容一说。看下源码：
+不可变类，属性value为不可变数组，即String初始化构造器没有初始容量的概念，你定义多少，String中字符数组的长度就是多少，不存在字符数组扩容一说。看下源码：
 
 ![avatar](pic/p5.png)
 
 ```java
 public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence {
-    /** The value is used for character storage. */
+    
     private final char value[];
 
-    /** Cache the hash code for the string */
     private int hash; // Default to 0
 
-    /** use serialVersionUID from JDK 1.0.2 for interoperability */
     private static final long serialVersionUID = -6849794470754667710L;
 
-    /**
-     * Class String is special cased within the Serialization Stream Protocol.
-     *
-     * A String instance is written into an ObjectOutputStream according to
-     * <a href="{@docRoot}/../platform/serialization/spec/output.html">
-     * Object Serialization Specification, Section 6.2, "Stream Elements"</a>
-     */
     private static final ObjectStreamField[] serialPersistentFields =
         new ObjectStreamField[0];
 
-    /**
-     * Initializes a newly created {@code String} object so that it represents
-     * an empty character sequence.  Note that use of this constructor is
-     * unnecessary since Strings are immutable.
-     */
     public String() {
         this.value = "".value;
     }
-
-    /**
-     * Initializes a newly created {@code String} object so that it represents
-     * the same sequence of characters as the argument; in other words, the
-     * newly created string is a copy of the argument string. Unless an
-     * explicit copy of {@code original} is needed, use of this constructor is
-     * unnecessary since Strings are immutable.
-     *
-     * @param  original
-     *         A {@code String}
-     */
     public String(String original) {
         this.value = original.value;
         this.hash = original.hash;
@@ -1268,22 +1269,7 @@ public String substring(int beginIndex) {
 
 ```java
 public String(char value[], int offset, int count) {
-    if (offset < 0) {
-        throw new StringIndexOutOfBoundsException(offset);
-    }
-    if (count <= 0) {
-        if (count < 0) {
-            throw new StringIndexOutOfBoundsException(count);
-        }
-        if (offset <= value.length) {
-            this.value = "".value;
-            return;
-        }
-    }
-    // Note: offset or count might be near -1>>>1.
-    if (offset > value.length - count) {
-        throw new StringIndexOutOfBoundsException(offset + count);
-    }
+    ...
     this.value = Arrays.copyOfRange(value, offset, offset+count);
 }
 
@@ -1302,7 +1288,7 @@ public static char[] copyOfRange(char[] original, int from, int to) {
 类似的我们可以看到，String类的concat方法，replace方法，都是内部重新生成一个String对象的。  
 这也就是为什么我们如果采用String对象频繁的进行拼接，截取，替换操作效率很低下的原因。
 
-#### StringBuilder
+### StringBuilder
 
 内部可变数组，存在初始化StringBuilder对象中字符数组容量为16，存在扩容。
 
@@ -1310,15 +1296,11 @@ public static char[] copyOfRange(char[] original, int from, int to) {
 
 StringBuilder类继承AbstractStringBuilder抽象类，其中StringBuilder的大部分方法都是直接调用的父类的实现。
 
-###### 构造方法
+#### 构造方法
 
 1. 空参数的构造方法
 
 ```java
-/**
- * Constructs a string builder with no characters in it and an
- * initial capacity of 16 characters.
- */
 public StringBuilder() {
     super(16);
 }
@@ -1334,14 +1316,6 @@ AbstractStringBuilder(int capacity) {
 2. 自定义初始容量-构造函数
 
 ```java
-/**
- * Constructs a string builder with no characters in it and an
- * initial capacity specified by the {@code capacity} argument.
- *
- * @param      capacity  the initial capacity.
- * @throws     NegativeArraySizeException  if the {@code capacity}
- *               argument is less than {@code 0}.
- */
 public StringBuilder(int capacity) {
     super(capacity);
 }
@@ -1352,13 +1326,6 @@ public StringBuilder(int capacity) {
 3. 以字符串String 作为参数的构造
 
 ```java
-/**
-     * Constructs a string builder initialized to the contents of the
-     * specified string. The initial capacity of the string builder is
-     * {@code 16} plus the length of the string argument.
-     *
-     * @param   str   the initial contents of the buffer.
-     */
 public StringBuilder(String str) {
     super(str.length() + 16);
     append(str);
@@ -1378,24 +1345,6 @@ public StringBuilder append(String str) {
 具体看下父类AbstractStringBuilder的append方法
 
 ```java
-/**
- * Appends the specified string to this character sequence.
- * <p>
- * The characters of the {@code String} argument are appended, in
- * order, increasing the length of this sequence by the length of the
- * argument. If {@code str} is {@code null}, then the four
- * characters {@code "null"} are appended.
- * <p>
- * Let <i>n</i> be the length of this character sequence just prior to
- * execution of the {@code append} method. Then the character at
- * index <i>k</i> in the new character sequence is equal to the character
- * at index <i>k</i> in the old character sequence, if <i>k</i> is less
- * than <i>n</i>; otherwise, it is equal to the character at index
- * <i>k-n</i> in the argument {@code str}.
- *
- * @param   str   a string.
- * @return  a reference to this object.
- */
 public AbstractStringBuilder append(String str) {
     if (str == null)
         return appendNull();
@@ -1426,13 +1375,6 @@ private AbstractStringBuilder appendNull() {
 其中ensureCapacityInternal方法是确保这次append 的时候StringBuilder的内部数组容量是满足的扩容的，即这次要append的null字符长度为4，加上之前内部数组中已有的字符位数cout之后作为参数执行。
 
 ```java
-/**
- * For positive values of {@code minimumCapacity}, this method
- * behaves like {@code ensureCapacity}, however it is never
- * synchronized.
- * If {@code minimumCapacity} is non positive due to numeric
- * overflow, this method throws {@code OutOfMemoryError}.
- */
 private void ensureCapacityInternal(int minimumCapacity) {
     // overflow-conscious code
     if (minimumCapacity - value.length > 0) {
@@ -1467,34 +1409,33 @@ append方法的关键：String的 getChars方法（从str的0位开始，到str�
 
 ```java
 public void getChars(int srcBegin, int srcEnd, char dst[], int dstBegin) {
-    if (srcBegin < 0) {
-        throw new StringIndexOutOfBoundsException(srcBegin);
-    }
-    if (srcEnd > value.length) {
-        throw new StringIndexOutOfBoundsException(srcEnd);
-    }
-    if (srcBegin > srcEnd) {
-        throw new StringIndexOutOfBoundsException(srcEnd - srcBegin);
-    }
+    ...
     System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
 }
 
+/* @param      src      the source array.
+ * @param      srcPos   starting position in the source array.
+ * @param      dest     the destination array.
+ * @param      destPos  starting position in the destination data.
+ * @param      length   the number of array elements to be copied.
+ **/
 public static native void arraycopy(Object src,  int srcPos, Object dest, int destPos,int length);
 ```
 
 其实是调用了System的arraycopy方法 参数如下:  
  
 * value 为str的内部不可变字符数组，   
-* srcBegin 为从str 字符串数组的0下标开始，    
+* srcBegin 为从str字符串数组的0下标开始，    
 * srcEnd 为str字符串数组的长度，    
 * dst 为StringBuilder对象的内部可变字符数组，    
 * dstBegin 则为StringBuilder对象中已有的字符长度（char[] 已有的元素长度）
 
-即整个StringBuilder的append方法，本质上是调用System的native方法，直接将String 类型的str字符串中的字符数组，拷贝到了StringBuilder的字符数组中
+即整个StringBuilder的append方法，本质上是调用System的native方法，直接将String类型的str字符串中的字符数组，拷贝到了StringBuilder的字符数组中
 
 ![avatar](pic/p7.png)
 
-###### toString()
+#### toString()
+
 ```java
 @Override
 public String toString() {
@@ -1504,14 +1445,20 @@ public String toString() {
 ```
 
 这里的toString方法直接new 一个String对象，将StringBuilder对象的value进行一个拷贝，重新生成一个对象，不共享之前StringBuilder的char[]。  
-以上就是StringBuilder的拼接字符串的原理分析，可以发现没有像String一样去重新new 对象，所以在频繁的拼接字符上，StringBuilder的效率远远高于String类。
+以上就是StringBuilder的拼接字符串的原理分析，可以发现没有像String一样去重新new对象，所以在频繁的拼接字符上，StringBuilder的效率远远高于String类。
 
-#### StringBuffer
+### StringBuffer
+
 线程安全的高效字符串操作类，看下源码：
+
 ![avatar](pic/p8.png)
-###### 构造方法
+
+一、构造方法
+
 ![avatar](pic/p9.png)
+
 类似于StringBuilder  
+
 append方法：
 
 ```java
@@ -1527,14 +1474,11 @@ public synchronized StringBuffer append(String str) {
 这里比StringBuilder多了一个参数
 
 ```java
-/**
- * A cache of the last value returned by toString. Cleared
- * whenever the StringBuffer is modified.
- */
 private transient char[] toStringCache;
 ```
 
-这里的作用简单介绍一下，就是去缓存toString的值  
+这里的作用简单介绍一下，就是缓存toString的值  
+
 可以看下StringBuffer的toString方法
 
 ```java
@@ -1551,13 +1495,13 @@ public synchronized String toString() {
 这里的作用就是如果StringBuffer对象此时存在toStringCache，在多次调用其toString方法时，其new出来的String对象是会共享同一个char[] 内存的，达到共享的目的。但是StringBuffer只要做了修改，其toStringCache属性值都会置null处理。这也是StringBuffer和StringBuilder的一个区别点。  
 <font color=red size=5>**_总结：_**</font>  
 
-1. String 类不可变，内部维护的char[] 数组长度不可变，为final修饰，String类也是final修饰，不存在扩容。字符串拼接，截取，都会生成一个新的对象。频繁操作字符串效率低下，因为每次都会生成新的对象。    StringBuilder 类内部维护可变长度char[] ， 初始化数组容量为16，存在扩容， 其append拼接字符串方法内部调用System的native方法，进行数组的拷贝，不会重新生成新的
-2. StringBuilder对象。非线程安全的字符串操作类， 其每次调用 toString方法而重新生成的String对象，不会共享StringBuilder对象内部的char[]，会进行一次char[]的copy操作。    
+1. String 类不可变，内部维护的char[] 数组长度不可变，为final修饰，String类也是final修饰，不存在扩容。字符串拼接，截取，都会生成一个新的对象。频繁操作字符串效率低下，因为每次都会生成新的对象。    
+2. StringBuilder 类内部维护可变长度char[] ，初始化数组容量为16，存在扩容，其append拼接字符串方法内部调用System的native方法，进行数组的拷贝，不会重新生成新的StringBuilder对象。非线程安全的字符串操作类，其每次调用 toString方法而重新生成的String对象，不会共享StringBuilder对象内部的char[]，会进行一次char[]的copy操作。    
 3. StringBuffer 类内部维护可变长度char[]， 基本上与StringBuilder一致，但其为线程安全的字符串操作类，大部分方法都采用了Synchronized关键字修改，以此来实现在多线程下的操作字符串的安全性。其toString方法而重新生成的String对象，会共享StringBuffer对象中的toStringCache属性（char[]），但是每次的StringBuffer对象修改，都会置null该属性值。
 
 ## String为什么要设计成不可变的？
 
-####不可变
+### 不可变
 
 不是在原内存地址上修改数据，而是重新指向一个新对象，新地址
 
@@ -1569,10 +1513,8 @@ public synchronized String toString() {
 public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence {
     
-    /** The value is used for character storage. */
     private final char value[];
 
-    /** Cache the hash code for the string */
     private int hash; // Default to 0
 
 }
@@ -1606,7 +1548,7 @@ value[2]=100;//这时候数组里已经是{1,2,100}
 
 所以String是不可变，在所有String的方法里很小心地没有去动Array里的元素，没有暴露内部成员字段。private final char value[]这一句里，private的私有访问权限的作用都比final大。而且设计师还很小心地反整个String设计成final禁止继承，避免被其他人继承后破坏。
 
-#### 好处
+### 好处
 
 1. 字符串常量池的需要
 
@@ -1625,14 +1567,14 @@ String s1= "ab" + "cd";
 String s2= "abc" + "d";
 ```
 
-他们都会指向常量池中的同一个对象. 或者,你可以用 jd-gui 之类的工具查看一下编译后的class文件.
+他们都会指向常量池中的同一个对象. 可以用 jd-gui 之类的工具查看一下编译后的class文件.
 
 每当我们创建字符串常量时，JVM会首先检查字符串常量池，如果该字符串已经存在常量池中，那么就直接返回常量池中的实例引用。如果字符串不存在常量池中，就会实例化该字符串并且将其放到常量池中。由于String字符串的不可变性我们可以十分肯定常量池中一定不存在两个相同的字符
 
-intern方法使用：一个初始为空的字符串池，它由类String独自维护。当调用 intern方法时，如果池已经包含一个等于此String对象的字符串（用equals(oject)方法确定），则返回池中的字符串。否则，将此String对象添加到池中，并返回此String对象的引用。
+intern方法使用：一个初始为空的字符串池，它由类String独自维护。当调用 intern方法时，如果池已经包含一个等于此String对象的字符串（用equals方法确定），则返回池中的字符串。否则，将此String对象添加到池中，并返回此String对象的引用。
 
 >Java虚拟机有一个字符串池，保存着几乎所有的字符串对象。字符串表达式总是指向字符串池中的一个对象。使用new操作创建的字符串对象不指向字符串池中的对象
->intern()方法的原理：如果池中已经有相同的 字符串。有则直接返回池中的字符串，否则先将字符串添加到池中，再返回。这步操作相当于手动向常量池里扔东西
+>intern方法的原理：如果池中已经有相同的 字符串。有则直接返回池中的字符串，否则先将字符串添加到池中，再返回。这步操作相当于手动向常量池里扔东西
 
 <font color=red>静态常量池：即*.class文件中的常量池，class文件中的常量池不仅仅包含字符串(数字)字面量，还包含类、方法的信息，占用class文件绝大部分空间。</font>  
 <font color=red>运行时常量池：则是jvm虚拟机在完成类装载操作后，将class文件中的常量池载入到内存中，并保存在方法区中，我们常说的常量池，就是指方法区中的运行时常量池。</font>  
@@ -1649,6 +1591,7 @@ Java中String对象的哈希码被频繁地使用, 比如在hashMap 等容器中
 
 
 ## 什么是内部类？内部类的作用
+
 #### 分类
 * 普通内部类
 * 静态内部类

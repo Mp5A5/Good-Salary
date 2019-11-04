@@ -12,7 +12,7 @@ public class Interrupted {
         try {
           TimeUnit.SECONDS.sleep(10);
         } catch (InterruptedException e) {
-          // e.printStackTrace();
+          e.printStackTrace();
         }
       }
     }
@@ -38,6 +38,7 @@ public class Interrupted {
     TimeUnit.SECONDS.sleep(5);
     sleepThread.interrupt();
     busyThread.interrupt();
+    Thread.interrupted();
     System.out.println("SleepThread interrupted is " + sleepThread.isInterrupted());
     System.out.println("BusyThread interrupted is " + busyThread.isInterrupted());
     // 防止sleepThread和busyThread立刻退出
